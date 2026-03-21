@@ -1,0 +1,161 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #1a1a2e;
+  color: #e0e0e0;
+  font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  font-size: 13px;
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  outline: none;
+}
+
+.drag-handle {
+  height: 24px;
+  background: #16213e;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.app-title {
+  color: #555;
+  font-size: 11px;
+  padding-left: 8px;
+  user-select: none;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 8px;
+  height: 100%;
+  line-height: 24px;
+}
+
+.close-btn:hover {
+  color: #e94560;
+  background: rgba(233, 69, 96, 0.15);
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: #16213e;
+  border-bottom: 1px solid #0f3460;
+  gap: 8px;
+}
+
+.search-icon {
+  color: #e94560;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.search-bar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.search-bar input::placeholder {
+  color: #555;
+}
+
+.result-count {
+  color: #555;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.results {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #0f3460 #1a1a2e;
+}
+
+.result-item {
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-left: 2px solid transparent;
+}
+
+.result-item.selected {
+  background: #16213e;
+  border-left-color: #e94560;
+}
+
+.result-item:hover {
+  background: #16213e;
+}
+
+.pin-mode {
+  border-bottom-color: #e94560;
+}
+
+.pin-icon {
+  flex-shrink: 0;
+  font-size: 11px;
+}
+
+.entry-label {
+  color: #e94560;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.entry-time {
+  margin-left: auto;
+  color: #555;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.entry-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.match-highlight {
+  color: #e94560;
+  font-weight: bold;
+}
+
+.empty {
+  padding: 24px;
+  text-align: center;
+  color: #555;
+}
+
+.status-bar {
+  padding: 4px 12px;
+  background: #16213e;
+  border-top: 1px solid #0f3460;
+  color: #555;
+  font-size: 11px;
+}

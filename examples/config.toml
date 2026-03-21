@@ -1,0 +1,16 @@
+# fclip configuration
+# Place this file at:
+#   %APPDATA%\fclip\config.toml  (e.g. C:\Users\<user>\AppData\Roaming\fclip\config.toml)
+
+[hotkey]
+open = "Ctrl+Shift+V"
+
+[behavior]
+max_history = 1000
+
+[keybindings]
+select = "Enter"
+close = "Escape"
+delete = "Ctrl+d"
+next = "Ctrl+n"
+prev = "Ctrl+p"
