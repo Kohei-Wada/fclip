@@ -87,7 +87,7 @@ function App() {
       e.preventDefault();
       getCurrentWindow().hide();
     } else if (matchesKeybinding(e, keybindings.delete)) {
-      if (results[selectedIndex]) {
+      if (results[selectedIndex] && !results[selectedIndex].pinned) {
         e.preventDefault();
         handleDelete(results[selectedIndex].id);
       }

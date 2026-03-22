@@ -126,7 +126,10 @@ impl Database {
 
     pub fn delete_entry(&self, id: i64) -> Result<()> {
         let conn = self.conn.lock()?;
-        conn.execute("DELETE FROM clipboard_entries WHERE id = ?1", params![id])?;
+        conn.execute(
+            "DELETE FROM clipboard_entries WHERE id = ?1 AND pinned = 0",
+            params![id],
+        )?;
         Ok(())
     }
 
@@ -191,6 +194,19 @@ mod tests {
 
         db.delete_entry(id).unwrap();
         assert_eq!(db.list_entries(1000).unwrap().len(), 0);
+    }
+
+    #[test]
+    fn test_delete_pinned_entry_is_blocked() {
+        let db = Database::open_in_memory().unwrap();
+        db.save_entry("pinned item").unwrap();
+
+        let entries = db.list_entries(1000).unwrap();
+        let id = entries[0].id;
+
+        db.toggle_pin(id, "keep".to_string()).unwrap();
+        db.delete_entry(id).unwrap();
+        assert_eq!(db.list_entries(1000).unwrap().len(), 1, "pinned entry should not be deleted");
     }
 
     #[test]

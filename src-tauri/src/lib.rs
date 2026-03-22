@@ -4,6 +4,7 @@ mod commands;
 mod config;
 mod constants;
 mod db;
+mod display;
 mod error;
 mod search;
 

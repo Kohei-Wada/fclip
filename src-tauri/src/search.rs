@@ -1,4 +1,5 @@
 use crate::db::ClipboardEntry;
+use crate::display::{build_display, DisplayInfo};
 use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
 use serde::Serialize;
@@ -12,11 +13,12 @@ pub struct SearchResult {
     pub pinned: bool,
     pub label: String,
     pub score: i64,
-    pub match_indices: Vec<usize>,
+    pub display: DisplayInfo,
 }
 
 impl From<ClipboardEntry> for SearchResult {
     fn from(e: ClipboardEntry) -> Self {
+        let display = build_display(&e.content, &[]);
         Self {
             id: e.id,
             content: e.content,
@@ -25,13 +27,14 @@ impl From<ClipboardEntry> for SearchResult {
             pinned: e.pinned,
             label: e.label,
             score: 0,
-            match_indices: vec![],
+            display,
         }
     }
 }
 
 impl SearchResult {
     fn with_match(entry: &ClipboardEntry, score: i64, indices: Vec<usize>) -> Self {
+        let display = build_display(&entry.content, &indices);
         Self {
             id: entry.id,
             content: entry.content.clone(),
@@ -40,7 +43,7 @@ impl SearchResult {
             pinned: entry.pinned,
             label: entry.label.clone(),
             score,
-            match_indices: indices,
+            display,
         }
     }
 }
@@ -93,6 +96,7 @@ impl FuzzySearcher {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::display::DisplaySegment;
 
     fn make_entry(id: i64, content: &str) -> ClipboardEntry {
         ClipboardEntry {
@@ -113,6 +117,13 @@ mod tests {
             last_used_at: String::new(),
             pinned: true,
             label: label.to_string(),
+        }
+    }
+
+    fn seg(text: &str, highlighted: bool) -> DisplaySegment {
+        DisplaySegment {
+            text: text.to_string(),
+            highlighted,
         }
     }
 
@@ -143,7 +154,8 @@ mod tests {
         assert_eq!(result.id, 1);
         assert_eq!(result.content, "hello");
         assert_eq!(result.score, 0);
-        assert!(result.match_indices.is_empty());
+        assert!(!result.display.truncated);
+        assert_eq!(result.display.segments, vec![seg("hello", false)]);
     }
 
     #[test]
@@ -151,25 +163,39 @@ mod tests {
         let entry = make_entry(1, "test");
         let result = SearchResult::with_match(&entry, 100, vec![0, 1]);
         assert_eq!(result.score, 100);
-        assert_eq!(result.match_indices, vec![0, 1]);
+        assert_eq!(
+            result.display.segments,
+            vec![seg("te", true), seg("st", false)]
+        );
     }
 
     #[test]
-    fn test_labeled_entry_highlight_offset() {
+    fn test_labeled_entry_highlight() {
         let searcher = FuzzySearcher::new();
         let entries = vec![make_labeled_entry(1, "hello world", "mypin")];
         let results = searcher.search(&entries, "hello", 50);
         assert_eq!(results.len(), 1);
-        assert_eq!(results[0].match_indices, vec![0, 1, 2, 3, 4]);
+        // "hello" should be highlighted in the display
+        let has_hello_hl = results[0]
+            .display
+            .segments
+            .iter()
+            .any(|s| s.highlighted && s.text == "hello");
+        assert!(has_hello_hl, "expected 'hello' highlighted: {:?}", results[0].display.segments);
     }
 
     #[test]
-    fn test_multibyte_label_highlight_offset() {
+    fn test_multibyte_label_highlight() {
         let searcher = FuzzySearcher::new();
         let entries = vec![make_labeled_entry(1, "test data", "\u{1F4CC}")];
         let results = searcher.search(&entries, "test", 50);
         assert_eq!(results.len(), 1);
-        assert_eq!(results[0].match_indices, vec![0, 1, 2, 3]);
+        let has_test_hl = results[0]
+            .display
+            .segments
+            .iter()
+            .any(|s| s.highlighted && s.text == "test");
+        assert!(has_test_hl, "expected 'test' highlighted: {:?}", results[0].display.segments);
     }
 
     #[test]
@@ -178,6 +204,7 @@ mod tests {
         let entries = vec![make_labeled_entry(1, "xyz", "important")];
         let results = searcher.search(&entries, "imp", 50);
         assert_eq!(results.len(), 1);
-        assert!(results[0].match_indices.is_empty());
+        // No highlights since matches are in label, not content
+        assert!(results[0].display.segments.iter().all(|s| !s.highlighted));
     }
 }

@@ -1,3 +1,13 @@
+export interface DisplaySegment {
+  text: string;
+  highlighted: boolean;
+}
+
+export interface DisplayInfo {
+  segments: DisplaySegment[];
+  truncated: boolean;
+}
+
 export interface SearchResult {
   id: number;
   content: string;
@@ -6,7 +16,7 @@ export interface SearchResult {
   pinned: boolean;
   label: string;
   score: number;
-  match_indices: number[];
+  display: DisplayInfo;
 }
 
 export interface Keybindings {
