@@ -50,7 +50,7 @@ pub fn build_display(content: &str, match_indices: &[usize]) -> DisplayInfo {
     let mut current_text = String::new();
     let mut current_hl = index_set.contains(&start);
 
-    for i in start..end {
+    for (i, &ch) in chars.iter().enumerate().skip(start).take(end - start) {
         let is_hl = index_set.contains(&i);
         if is_hl != current_hl {
             if !current_text.is_empty() {
@@ -62,7 +62,7 @@ pub fn build_display(content: &str, match_indices: &[usize]) -> DisplayInfo {
             current_text = String::new();
             current_hl = is_hl;
         }
-        current_text.push(chars[i]);
+        current_text.push(ch);
     }
     if !current_text.is_empty() {
         segments.push(DisplaySegment {
