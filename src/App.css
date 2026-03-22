@@ -23,19 +23,22 @@ body {
   height: 24px;
   background: #16213e;
   cursor: grab;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: flex-end;
 }
 
 .app-title {
+  grid-column: 2;
   color: #555;
   font-size: 11px;
-  padding-left: 8px;
   user-select: none;
+  text-align: center;
 }
 
 .close-btn {
+  grid-column: 3;
+  justify-self: end;
   background: none;
   border: none;
   color: #555;
