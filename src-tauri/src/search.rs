@@ -64,13 +64,23 @@ impl FuzzySearcher {
         let mut results: Vec<SearchResult> = entries
             .iter()
             .filter_map(|e| {
-                let search_text = if e.label.is_empty() {
-                    e.content.clone()
-                } else {
+                let has_label = !e.label.is_empty();
+                let search_text = if has_label {
                     format!("{} {}", e.label, e.content)
+                } else {
+                    e.content.clone()
                 };
                 let (score, indices) = self.matcher.fuzzy_indices(&search_text, query)?;
-                Some(SearchResult::with_match(e, score, indices))
+                let adjusted_indices = if has_label {
+                    let offset = e.label.chars().count() + 1;
+                    indices.into_iter()
+                        .filter(|&i| i >= offset)
+                        .map(|i| i - offset)
+                        .collect()
+                } else {
+                    indices
+                };
+                Some(SearchResult::with_match(e, score, adjusted_indices))
             })
             .collect();
 
@@ -92,6 +102,17 @@ mod tests {
             last_used_at: String::new(),
             pinned: false,
             label: String::new(),
+        }
+    }
+
+    fn make_labeled_entry(id: i64, content: &str, label: &str) -> ClipboardEntry {
+        ClipboardEntry {
+            id,
+            content: content.to_string(),
+            created_at: String::new(),
+            last_used_at: String::new(),
+            pinned: true,
+            label: label.to_string(),
         }
     }
 
@@ -131,5 +152,32 @@ mod tests {
         let result = SearchResult::with_match(&entry, 100, vec![0, 1]);
         assert_eq!(result.score, 100);
         assert_eq!(result.match_indices, vec![0, 1]);
+    }
+
+    #[test]
+    fn test_labeled_entry_highlight_offset() {
+        let searcher = FuzzySearcher::new();
+        let entries = vec![make_labeled_entry(1, "hello world", "mypin")];
+        let results = searcher.search(&entries, "hello", 50);
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].match_indices, vec![0, 1, 2, 3, 4]);
+    }
+
+    #[test]
+    fn test_multibyte_label_highlight_offset() {
+        let searcher = FuzzySearcher::new();
+        let entries = vec![make_labeled_entry(1, "test data", "\u{1F4CC}")];
+        let results = searcher.search(&entries, "test", 50);
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].match_indices, vec![0, 1, 2, 3]);
+    }
+
+    #[test]
+    fn test_match_in_label_only() {
+        let searcher = FuzzySearcher::new();
+        let entries = vec![make_labeled_entry(1, "xyz", "important")];
+        let results = searcher.search(&entries, "imp", 50);
+        assert_eq!(results.len(), 1);
+        assert!(results[0].match_indices.is_empty());
     }
 }
