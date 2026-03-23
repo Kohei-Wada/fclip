@@ -1,7 +1,7 @@
 {
   "name": "fclip",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "tauri dev",
@@ -14,7 +14,8 @@
     "tauri": "tauri",
     "vite": "vite",
     "vite:build": "tsc && vite build",
-    "prepare": "husky"
+    "prepare": "husky",
+    "bump": "node scripts/bump-version.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
