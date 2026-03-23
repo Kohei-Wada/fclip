@@ -7,7 +7,7 @@
 body {
   background: #1a1a2e;
   color: #e0e0e0;
-  font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace, "Segoe UI Emoji";
   font-size: 13px;
   overflow: hidden;
 }

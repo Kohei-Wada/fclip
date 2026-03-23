@@ -233,6 +233,17 @@ mod tests {
     }
 
     #[test]
+    fn test_emoji_round_trip() {
+        let db = Database::open_in_memory().unwrap();
+        let emoji_text = "Hello \u{1F600}\u{1F680} world \u{1F468}\u{200D}\u{1F4BB}";
+        db.save_entry(emoji_text).unwrap();
+
+        let entries = db.list_entries(1000).unwrap();
+        assert_eq!(entries.len(), 1);
+        assert_eq!(entries[0].content, emoji_text);
+    }
+
+    #[test]
     fn test_hash_content_deterministic() {
         assert_eq!(hash_content("abc"), hash_content("abc"));
         assert_ne!(hash_content("abc"), hash_content("def"));
