@@ -17,7 +17,11 @@ pub fn search_clipboard(
     state: State<AppState>,
 ) -> Result<Vec<SearchResult>, FclipError> {
     use crate::constants::MAX_SEARCH_RESULTS;
-    let limit = if query.is_empty() { MAX_SEARCH_RESULTS } else { state.config.behavior.max_history };
+    let limit = if query.is_empty() {
+        MAX_SEARCH_RESULTS
+    } else {
+        state.config.behavior.max_history
+    };
     let entries = state.db.list_entries(limit)?;
     Ok(state.searcher.search(&entries, &query, MAX_SEARCH_RESULTS))
 }

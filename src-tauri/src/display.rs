@@ -93,10 +93,7 @@ fn sanitize_char(c: char) -> char {
 }
 
 /// Determine the display window (start..end) and whether to show ellipsis.
-fn compute_window(
-    chars: &[char],
-    match_indices: &[usize],
-) -> (usize, usize, bool, bool) {
+fn compute_window(chars: &[char], match_indices: &[usize]) -> (usize, usize, bool, bool) {
     let total = chars.len();
     let max_len = MAX_DISPLAY_LEN;
 
@@ -230,8 +227,15 @@ mod tests {
         // Should have prefix "..." since window slides
         assert_eq!(info.segments[0], seg("...", false));
         // Should contain the highlighted "MATCH" somewhere
-        let has_match = info.segments.iter().any(|s| s.highlighted && s.text.contains("MATCH"));
-        assert!(has_match, "MATCH should be highlighted in segments: {:?}", info.segments);
+        let has_match = info
+            .segments
+            .iter()
+            .any(|s| s.highlighted && s.text.contains("MATCH"));
+        assert!(
+            has_match,
+            "MATCH should be highlighted in segments: {:?}",
+            info.segments
+        );
     }
 
     #[test]
@@ -253,7 +257,10 @@ mod tests {
         assert!(!info.truncated);
         assert_eq!(
             info.segments,
-            vec![seg("abc", true), seg(" \u{1F468}\u{200D}\u{1F4BB} xyz", false)]
+            vec![
+                seg("abc", true),
+                seg(" \u{1F468}\u{200D}\u{1F4BB} xyz", false)
+            ]
         );
     }
 

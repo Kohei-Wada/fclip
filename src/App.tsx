@@ -114,7 +114,9 @@ function App() {
     <div className="container">
       <div className="drag-handle" data-tauri-drag-region>
         <span className="app-title">fclip v{__APP_VERSION__}</span>
-        <button className="close-btn" onClick={() => getCurrentWindow().hide()}>×</button>
+        <button className="close-btn" onClick={() => getCurrentWindow().hide()}>
+          ×
+        </button>
       </div>
       {pinMode ? (
         <div className="search-bar pin-mode">

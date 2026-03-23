@@ -1,0 +1,2 @@
+cd src-tauri && cargo fmt --check && cargo clippy -- -D warnings && cd ..
+npx lint-staged
