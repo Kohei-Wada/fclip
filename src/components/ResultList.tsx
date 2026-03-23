@@ -35,9 +35,7 @@ export function ResultList({
           <span className="entry-time">{formatDate(result.created_at)}</span>
         </div>
       ))}
-      {results.length === 0 && (
-        <div className="empty">No entries found</div>
-      )}
+      {results.length === 0 && <div className="empty">No entries found</div>}
     </div>
   );
 }

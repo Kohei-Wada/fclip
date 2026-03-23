@@ -102,7 +102,11 @@ impl Config {
             match fs::read_to_string(&path) {
                 Ok(content) => Self::from_toml(&content),
                 Err(e) => {
-                    eprintln!("[fclip] WARNING: Failed to read config {}: {}", path.display(), e);
+                    eprintln!(
+                        "[fclip] WARNING: Failed to read config {}: {}",
+                        path.display(),
+                        e
+                    );
                     Self::default()
                 }
             }

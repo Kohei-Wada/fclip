@@ -158,11 +158,13 @@ impl Database {
         let conn = self.conn.lock()?;
         let now = chrono::Utc::now().to_rfc3339();
 
-        let content: Option<String> = conn.query_row(
-            "UPDATE clipboard_entries SET last_used_at = ?1 WHERE id = ?2 RETURNING content",
-            params![now, id],
-            |row| row.get(0),
-        ).optional()?;
+        let content: Option<String> = conn
+            .query_row(
+                "UPDATE clipboard_entries SET last_used_at = ?1 WHERE id = ?2 RETURNING content",
+                params![now, id],
+                |row| row.get(0),
+            )
+            .optional()?;
 
         content.ok_or(crate::error::FclipError::NotFound(id))
     }
@@ -206,7 +208,11 @@ mod tests {
 
         db.toggle_pin(id, "keep".to_string()).unwrap();
         db.delete_entry(id).unwrap();
-        assert_eq!(db.list_entries(1000).unwrap().len(), 1, "pinned entry should not be deleted");
+        assert_eq!(
+            db.list_entries(1000).unwrap().len(),
+            1,
+            "pinned entry should not be deleted"
+        );
     }
 
     #[test]

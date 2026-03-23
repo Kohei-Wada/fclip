@@ -59,9 +59,19 @@ impl FuzzySearcher {
         }
     }
 
-    pub fn search(&self, entries: &[ClipboardEntry], query: &str, max_results: usize) -> Vec<SearchResult> {
+    pub fn search(
+        &self,
+        entries: &[ClipboardEntry],
+        query: &str,
+        max_results: usize,
+    ) -> Vec<SearchResult> {
         if query.is_empty() {
-            return entries.iter().take(max_results).cloned().map(SearchResult::from).collect();
+            return entries
+                .iter()
+                .take(max_results)
+                .cloned()
+                .map(SearchResult::from)
+                .collect();
         }
 
         let mut results: Vec<SearchResult> = entries
@@ -76,7 +86,8 @@ impl FuzzySearcher {
                 let (score, indices) = self.matcher.fuzzy_indices(&search_text, query)?;
                 let adjusted_indices = if has_label {
                     let offset = e.label.chars().count() + 1;
-                    indices.into_iter()
+                    indices
+                        .into_iter()
                         .filter(|&i| i >= offset)
                         .map(|i| i - offset)
                         .collect()
@@ -181,7 +192,11 @@ mod tests {
             .segments
             .iter()
             .any(|s| s.highlighted && s.text == "hello");
-        assert!(has_hello_hl, "expected 'hello' highlighted: {:?}", results[0].display.segments);
+        assert!(
+            has_hello_hl,
+            "expected 'hello' highlighted: {:?}",
+            results[0].display.segments
+        );
     }
 
     #[test]
@@ -195,7 +210,11 @@ mod tests {
             .segments
             .iter()
             .any(|s| s.highlighted && s.text == "test");
-        assert!(has_test_hl, "expected 'test' highlighted: {:?}", results[0].display.segments);
+        assert!(
+            has_test_hl,
+            "expected 'test' highlighted: {:?}",
+            results[0].display.segments
+        );
     }
 
     #[test]

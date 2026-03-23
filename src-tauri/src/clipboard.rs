@@ -69,11 +69,7 @@ impl ClipboardWatcher {
                         None => return CallbackResult::Next,
                     };
                     if let Some(text) = self.watcher.check_new_content(text) {
-                        ClipboardWatcher::handle_new_content(
-                            &self.watcher,
-                            &self.app_handle,
-                            text,
-                        );
+                        ClipboardWatcher::handle_new_content(&self.watcher, &self.app_handle, text);
                     }
                     CallbackResult::Next
                 }
