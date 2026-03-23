@@ -72,6 +72,12 @@ function App() {
       return;
     }
 
+    if (e.ctrlKey && e.key === "u") {
+      e.preventDefault();
+      setQuery("");
+      return;
+    }
+
     if (matchesKeybinding(e, keybindings.next)) {
       e.preventDefault();
       setSelectedIndex((i) => (i + 1) % Math.max(results.length, 1));
