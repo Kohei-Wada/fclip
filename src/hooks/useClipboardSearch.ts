@@ -45,6 +45,8 @@ export function useClipboardSearch() {
     const unlisten = getCurrentWindow().onFocusChanged(({ payload: focused }) => {
       if (focused) {
         setQuery("");
+        setResults([]);
+        setSelectedIndex(0);
         search("");
         inputRef.current?.focus();
       }
