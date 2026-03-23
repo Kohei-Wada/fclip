@@ -78,10 +78,10 @@ fn setup_global_shortcut(
 pub fn run() {
     let config = Config::load();
 
-    let db_path = dirs::data_dir()
+    let db_path = dirs::data_local_dir()
         .unwrap_or_else(|| std::path::PathBuf::from("."))
-        .join("fclip")
-        .join("history.db");
+        .join(crate::constants::APP_DIR_NAME)
+        .join(crate::constants::DB_FILENAME);
 
     let db = Arc::new(Database::new(&db_path).expect("Failed to initialize database"));
 

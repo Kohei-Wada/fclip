@@ -4,7 +4,13 @@ use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Emitter};
 
 fn get_clipboard_text() -> Option<String> {
-    clipboard_win::get_clipboard_string().ok()
+    match clipboard_win::get_clipboard_string() {
+        Ok(text) => Some(text),
+        Err(e) => {
+            log::warn!("Failed to read clipboard: {}", e);
+            None
+        }
+    }
 }
 
 pub struct ClipboardWatcher {
@@ -44,9 +50,13 @@ impl ClipboardWatcher {
     fn handle_new_content(watcher: &Arc<Self>, app_handle: &AppHandle, text: String) {
         match watcher.db.save_entry(&text) {
             Ok(result) => {
-                let _ = app_handle.emit("clipboard-updated", ());
+                if let Err(e) = app_handle.emit("clipboard-updated", ()) {
+                    log::error!("Failed to emit clipboard-updated event: {}", e);
+                }
                 if result == InsertResult::New {
-                    let _ = watcher.db.enforce_history_limit(watcher.max_history);
+                    if let Err(e) = watcher.db.enforce_history_limit(watcher.max_history) {
+                        log::error!("Failed to enforce history limit: {}", e);
+                    }
                 }
             }
             Err(e) => log::error!("Failed to save clipboard entry: {}", e),
