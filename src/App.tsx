@@ -31,13 +31,12 @@ function App() {
     setPinLabel("");
   };
 
-  const confirmPin = () => {
+  const confirmPin = async () => {
     if (!pinMode) return;
-    invoke("toggle_pin", { id: pinMode.id, label: pinLabel }).then(() => {
-      setPinMode(null);
-      setPinLabel("");
-      refreshSearch();
-    });
+    await invoke("toggle_pin", { id: pinMode.id, label: pinLabel });
+    setPinMode(null);
+    setPinLabel("");
+    refreshSearch();
   };
 
   const cancelPin = () => {
@@ -46,7 +45,7 @@ function App() {
     inputRef.current?.focus();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = async (e: React.KeyboardEvent) => {
     if (!keybindings) return;
 
     if (pinMode) {
@@ -102,7 +101,8 @@ function App() {
         e.preventDefault();
         const current = results[selectedIndex];
         if (current.pinned) {
-          invoke("toggle_pin", { id: current.id, label: "" }).then(() => refreshSearch());
+          await invoke("toggle_pin", { id: current.id, label: "" });
+          refreshSearch();
         } else {
           enterPinMode(current.id);
         }

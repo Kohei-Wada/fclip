@@ -24,7 +24,11 @@ export function useKeybindings() {
   const [keybindings, setKeybindings] = useState<Keybindings | null>(null);
 
   useEffect(() => {
-    invoke<Keybindings>("get_keybindings").then(setKeybindings);
+    const load = async () => {
+      const kb = await invoke<Keybindings>("get_keybindings");
+      setKeybindings(kb);
+    };
+    load();
   }, []);
 
   return keybindings;
