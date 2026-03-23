@@ -9,6 +9,8 @@ pub enum FclipError {
     Clipboard(String),
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
+    #[error("Entry not found: {0}")]
+    NotFound(i64),
     #[error("Lock poisoned")]
     LockPoisoned,
 }

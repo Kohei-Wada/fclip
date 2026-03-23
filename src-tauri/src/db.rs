@@ -1,5 +1,5 @@
 use crate::error::Result;
-use rusqlite::{params, Connection};
+use rusqlite::{params, Connection, OptionalExtension};
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 use std::path::Path;
@@ -146,25 +146,25 @@ impl Database {
 
     pub fn toggle_pin(&self, id: i64, label: String) -> Result<bool> {
         let conn = self.conn.lock()?;
-        let pinned: bool = conn.query_row(
+        let pinned: Option<bool> = conn.query_row(
             "UPDATE clipboard_entries SET pinned = 1 - pinned, label = CASE WHEN pinned = 0 THEN ?1 ELSE '' END WHERE id = ?2 RETURNING pinned",
             params![label, id],
             |row| Ok(row.get::<_, i32>(0)? != 0),
-        )?;
-        Ok(pinned)
+        ).optional()?;
+        pinned.ok_or(crate::error::FclipError::NotFound(id))
     }
 
     pub fn use_entry(&self, id: i64) -> Result<String> {
         let conn = self.conn.lock()?;
         let now = chrono::Utc::now().to_rfc3339();
 
-        let content: String = conn.query_row(
+        let content: Option<String> = conn.query_row(
             "UPDATE clipboard_entries SET last_used_at = ?1 WHERE id = ?2 RETURNING content",
             params![now, id],
             |row| row.get(0),
-        )?;
+        ).optional()?;
 
-        Ok(content)
+        content.ok_or(crate::error::FclipError::NotFound(id))
     }
 }
 
@@ -241,6 +241,20 @@ mod tests {
         let entries = db.list_entries(1000).unwrap();
         assert_eq!(entries.len(), 1);
         assert_eq!(entries[0].content, emoji_text);
+    }
+
+    #[test]
+    fn test_use_entry_not_found() {
+        let db = Database::open_in_memory().unwrap();
+        let err = db.use_entry(9999).unwrap_err();
+        assert!(matches!(err, crate::error::FclipError::NotFound(9999)));
+    }
+
+    #[test]
+    fn test_toggle_pin_not_found() {
+        let db = Database::open_in_memory().unwrap();
+        let err = db.toggle_pin(9999, "label".to_string()).unwrap_err();
+        assert!(matches!(err, crate::error::FclipError::NotFound(9999)));
     }
 
     #[test]
