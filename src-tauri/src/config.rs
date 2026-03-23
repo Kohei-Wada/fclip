@@ -92,8 +92,8 @@ impl Config {
     pub fn config_path() -> PathBuf {
         dirs::config_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join("fclip")
-            .join("config.toml")
+            .join(crate::constants::APP_DIR_NAME)
+            .join(crate::constants::CONFIG_FILENAME)
     }
 
     pub fn load() -> Self {

@@ -9,3 +9,12 @@ pub const MAX_DISPLAY_LEN: usize = 100;
 
 /// Number of context characters shown around matches when windowing
 pub const DISPLAY_CONTEXT_CHARS: usize = 20;
+
+/// Application directory name
+pub const APP_DIR_NAME: &str = "fclip";
+
+/// Database filename
+pub const DB_FILENAME: &str = "history.db";
+
+/// Config filename
+pub const CONFIG_FILENAME: &str = "config.toml";
