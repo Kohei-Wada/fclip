@@ -80,7 +80,11 @@ export function useClipboardSearch() {
   const handleDelete = async (id: number) => {
     try {
       await invoke("delete_entry", { id });
-      search(query);
+      const res = await invoke<SearchResult[]>("search_clipboard", {
+        query: queryRef.current,
+      });
+      setResults(res);
+      setSelectedIndex((prev) => Math.min(prev, Math.max(res.length - 1, 0)));
     } catch (e) {
       console.error("Delete failed:", e);
     }
