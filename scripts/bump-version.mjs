@@ -8,12 +8,17 @@ if (!version || !/^\d+\.\d+\.\d+$/.test(version)) {
 }
 
 function replaceVersion(file, pattern, replacement) {
-  const content = readFileSync(file, "utf-8");
-  const updated = content.replace(pattern, replacement);
-  if (content === updated) {
-    console.warn(`  WARNING: no change in ${file}`);
+  try {
+    const content = readFileSync(file, "utf-8");
+    const updated = content.replace(pattern, replacement);
+    if (content === updated) {
+      console.warn(`  WARNING: no change in ${file}`);
+    }
+    writeFileSync(file, updated);
+  } catch (error) {
+    console.error(`ERROR: Failed to update ${file}: ${error.message}`);
+    process.exit(1);
   }
-  writeFileSync(file, updated);
 }
 
 console.log(`Bumping version to ${version}...`);
@@ -37,8 +42,13 @@ replaceVersion(
 
 // Update lock files
 console.log("Updating lock files...");
-execSync("npm install --package-lock-only --silent", { stdio: "inherit" });
-execSync("cargo check --quiet --manifest-path src-tauri/Cargo.toml", { stdio: "inherit" });
+try {
+  execSync("npm install --package-lock-only --silent", { stdio: "inherit" });
+  execSync("cargo check --quiet --manifest-path src-tauri/Cargo.toml", { stdio: "inherit" });
+} catch (error) {
+  console.error("ERROR: Failed to update lock files:", error.message);
+  process.exit(1);
+}
 
 console.log(`\nDone! Updated to v${version}`);
 console.log("  - package.json");
