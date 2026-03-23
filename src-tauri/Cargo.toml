@@ -1,11 +1,11 @@
 [package]
 name = "fclip"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+version = "0.2.0"
+description = "A fast, keyboard-driven clipboard manager for Windows"
+authors = ["Kohei Wada"]
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+repository = "https://github.com/Kohei-Wada/fclip"
+license = "MIT"
 
 [lib]
 # The `_lib` suffix may seem redundant but it is necessary
