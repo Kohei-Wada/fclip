@@ -246,6 +246,28 @@ mod tests {
     }
 
     #[test]
+    fn test_zwj_emoji_content() {
+        // Man technologist: U+1F468 ZWJ U+1F4BB (3 chars: \u{1F468}, \u{200D}, \u{1F4BB})
+        let info = build_display("abc \u{1F468}\u{200D}\u{1F4BB} xyz", &[0, 1, 2]);
+        // chars: a(0) b(1) c(2) ' '(3) \u{1F468}(4) \u{200D}(5) \u{1F4BB}(6) ' '(7) x(8) y(9) z(10)
+        assert!(!info.truncated);
+        assert_eq!(
+            info.segments,
+            vec![seg("abc", true), seg(" \u{1F468}\u{200D}\u{1F4BB} xyz", false)]
+        );
+    }
+
+    #[test]
+    fn test_emoji_only_content() {
+        let info = build_display("\u{1F600}\u{1F680}\u{1F30D}", &[]);
+        assert!(!info.truncated);
+        assert_eq!(
+            info.segments,
+            vec![seg("\u{1F600}\u{1F680}\u{1F30D}", false)]
+        );
+    }
+
+    #[test]
     fn test_newline_replaced() {
         let info = build_display("line1\nline2\tline3", &[]);
         assert!(!info.truncated);
