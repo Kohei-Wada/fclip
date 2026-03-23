@@ -44,10 +44,7 @@ export function useClipboardSearch() {
   useEffect(() => {
     const unlisten = getCurrentWindow().onFocusChanged(({ payload: focused }) => {
       if (focused) {
-        setQuery("");
-        setResults([]);
-        setSelectedIndex(0);
-        search("");
+        search(queryRef.current);
         inputRef.current?.focus();
       }
     });
