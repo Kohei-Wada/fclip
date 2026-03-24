@@ -1,6 +1,6 @@
 [package]
 name = "fclip"
-version = "0.2.0"
+version = "0.3.0"
 description = "A fast, keyboard-driven clipboard manager for Windows"
 authors = ["Kohei Wada"]
 edition = "2021"
