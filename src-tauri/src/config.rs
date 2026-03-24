@@ -109,6 +109,9 @@ pub struct KeybindingsResponse {
 fn parse_key(s: &str) -> Key {
     let parts: Vec<&str> = s.trim().split('+').collect();
     let key = parts.last().unwrap_or(&"").to_lowercase();
+    if key.is_empty() {
+        eprintln!("[fclip] WARNING: Empty keybinding string: '{}'", s);
+    }
     let has = |m: &str| parts.iter().any(|p| p.eq_ignore_ascii_case(m));
     Key {
         key,
@@ -120,7 +123,11 @@ fn parse_key(s: &str) -> Key {
 }
 
 fn parse_bindings(s: &str) -> Vec<Key> {
-    s.split(',').map(parse_key).collect()
+    s.split(',')
+        .map(|b| b.trim())
+        .filter(|b| !b.is_empty())
+        .map(parse_key)
+        .collect()
 }
 
 impl KeybindingsConfig {
@@ -338,6 +345,28 @@ prev = "Ctrl+k"
         assert_eq!(bindings[1].key, "j");
         assert!(bindings[0].ctrl);
         assert!(bindings[1].ctrl);
+    }
+
+    #[test]
+    fn test_parse_bindings_filters_empty_entries() {
+        let bindings = parse_bindings("Ctrl+n,,Ctrl+j");
+        assert_eq!(bindings.len(), 2);
+        assert_eq!(bindings[0].key, "n");
+        assert_eq!(bindings[1].key, "j");
+    }
+
+    #[test]
+    fn test_parse_bindings_empty_string() {
+        let bindings = parse_bindings("");
+        assert_eq!(bindings.len(), 0);
+    }
+
+    #[test]
+    fn test_parse_bindings_whitespace_around_commas() {
+        let bindings = parse_bindings("Ctrl+n , Ctrl+j");
+        assert_eq!(bindings.len(), 2);
+        assert_eq!(bindings[0].key, "n");
+        assert_eq!(bindings[1].key, "j");
     }
 
     #[test]
