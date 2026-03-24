@@ -16,7 +16,8 @@
     "vite": "vite",
     "vite:build": "tsc && vite build",
     "prepare": "husky",
-    "bump": "node scripts/bump-version.mjs"
+    "bump": "node scripts/bump-version.mjs",
+    "changelog": "npx git-cliff --output CHANGELOG.md"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
