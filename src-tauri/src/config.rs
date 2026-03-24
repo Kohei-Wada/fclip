@@ -36,6 +36,10 @@ pub struct KeybindingsConfig {
     pub next: String,
     #[serde(default = "default_prev")]
     pub prev: String,
+    #[serde(default = "default_backspace")]
+    pub backspace: String,
+    #[serde(default = "default_clear")]
+    pub clear: String,
 }
 
 fn default_hotkey() -> String {
@@ -58,6 +62,12 @@ fn default_next() -> String {
 }
 fn default_prev() -> String {
     "Ctrl+p".to_string()
+}
+fn default_backspace() -> String {
+    "Ctrl+h".to_string()
+}
+fn default_clear() -> String {
+    "Ctrl+u".to_string()
 }
 
 impl Default for HotkeyConfig {
@@ -84,6 +94,8 @@ impl Default for KeybindingsConfig {
             delete: default_delete(),
             next: default_next(),
             prev: default_prev(),
+            backspace: default_backspace(),
+            clear: default_clear(),
         }
     }
 }
@@ -135,6 +147,8 @@ mod tests {
         assert_eq!(config.keybindings.delete, "Ctrl+d");
         assert_eq!(config.keybindings.next, "Ctrl+n");
         assert_eq!(config.keybindings.prev, "Ctrl+p");
+        assert_eq!(config.keybindings.backspace, "Ctrl+h");
+        assert_eq!(config.keybindings.clear, "Ctrl+u");
     }
 
     #[test]
