@@ -25,4 +25,6 @@ export interface Keybindings {
   delete: string;
   next: string;
   prev: string;
+  backspace: string;
+  clear: string;
 }

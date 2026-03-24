@@ -55,6 +55,12 @@ function App() {
       } else if (e.key === "Escape" || (e.ctrlKey && e.key === "[")) {
         e.preventDefault();
         cancelPin();
+      } else if (matchesKeybinding(e, keybindings.backspace)) {
+        e.preventDefault();
+        setPinLabel((l) => l.slice(0, -1));
+      } else if (matchesKeybinding(e, keybindings.clear)) {
+        e.preventDefault();
+        setPinLabel("");
       }
       return;
     }
@@ -65,13 +71,13 @@ function App() {
       return;
     }
 
-    if (e.ctrlKey && e.key === "h") {
+    if (matchesKeybinding(e, keybindings.backspace)) {
       e.preventDefault();
       setQuery((q) => q.slice(0, -1));
       return;
     }
 
-    if (e.ctrlKey && e.key === "u") {
+    if (matchesKeybinding(e, keybindings.clear)) {
       e.preventDefault();
       setQuery("");
       return;

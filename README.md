@@ -99,6 +99,8 @@ close = "Escape"
 delete = "Ctrl+d"
 next = "Ctrl+n"
 prev = "Ctrl+p"
+backspace = "Ctrl+h"
+clear = "Ctrl+u"
 ```
 
 ## Architecture
