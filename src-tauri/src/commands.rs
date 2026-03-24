@@ -1,4 +1,4 @@
-use crate::config::{Config, KeybindingsConfig};
+use crate::config::{Config, KeybindingsResponse};
 use crate::db::Database;
 use crate::error::FclipError;
 use crate::search::{FuzzySearcher, SearchResult};
@@ -45,6 +45,6 @@ pub fn toggle_pin(id: i64, label: String, state: State<AppState>) -> Result<bool
 }
 
 #[tauri::command]
-pub fn get_keybindings(state: State<AppState>) -> KeybindingsConfig {
-    state.config.keybindings.clone()
+pub fn get_keybindings(state: State<AppState>) -> KeybindingsResponse {
+    state.config.keybindings.to_response()
 }

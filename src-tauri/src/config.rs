@@ -86,6 +86,57 @@ impl Default for BehaviorConfig {
     }
 }
 
+#[derive(Debug, Serialize, Clone, PartialEq)]
+pub struct Key {
+    pub key: String,
+    pub ctrl: bool,
+    pub shift: bool,
+    pub alt: bool,
+    pub meta: bool,
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct KeybindingsResponse {
+    pub select: Vec<Key>,
+    pub close: Vec<Key>,
+    pub delete: Vec<Key>,
+    pub next: Vec<Key>,
+    pub prev: Vec<Key>,
+    pub backspace: Vec<Key>,
+    pub clear: Vec<Key>,
+}
+
+fn parse_key(s: &str) -> Key {
+    let parts: Vec<&str> = s.trim().split('+').collect();
+    let key = parts.last().unwrap_or(&"").to_lowercase();
+    let has = |m: &str| parts.iter().any(|p| p.eq_ignore_ascii_case(m));
+    Key {
+        key,
+        ctrl: has("ctrl"),
+        shift: has("shift"),
+        alt: has("alt"),
+        meta: has("meta"),
+    }
+}
+
+fn parse_bindings(s: &str) -> Vec<Key> {
+    s.split(',').map(|b| parse_key(b)).collect()
+}
+
+impl KeybindingsConfig {
+    pub fn to_response(&self) -> KeybindingsResponse {
+        KeybindingsResponse {
+            select: parse_bindings(&self.select),
+            close: parse_bindings(&self.close),
+            delete: parse_bindings(&self.delete),
+            next: parse_bindings(&self.next),
+            prev: parse_bindings(&self.prev),
+            backspace: parse_bindings(&self.backspace),
+            clear: parse_bindings(&self.clear),
+        }
+    }
+}
+
 impl Default for KeybindingsConfig {
     fn default() -> Self {
         Self {
@@ -194,5 +245,144 @@ prev = "Ctrl+k"
         assert_eq!(config.keybindings.prev, "Ctrl+k");
         assert_eq!(config.keybindings.close, "Escape");
         assert_eq!(config.keybindings.delete, "Ctrl+d");
+    }
+
+    #[test]
+    fn test_parse_key_simple() {
+        let key = parse_key("Enter");
+        assert_eq!(
+            key,
+            Key {
+                key: "enter".into(),
+                ctrl: false,
+                shift: false,
+                alt: false,
+                meta: false
+            }
+        );
+    }
+
+    #[test]
+    fn test_parse_key_single_modifier() {
+        let key = parse_key("Ctrl+d");
+        assert_eq!(
+            key,
+            Key {
+                key: "d".into(),
+                ctrl: true,
+                shift: false,
+                alt: false,
+                meta: false
+            }
+        );
+    }
+
+    #[test]
+    fn test_parse_key_multiple_modifiers() {
+        let key = parse_key("Ctrl+Shift+V");
+        assert_eq!(
+            key,
+            Key {
+                key: "v".into(),
+                ctrl: true,
+                shift: true,
+                alt: false,
+                meta: false
+            }
+        );
+    }
+
+    #[test]
+    fn test_parse_key_case_insensitive() {
+        let key = parse_key("ctrl+D");
+        assert_eq!(
+            key,
+            Key {
+                key: "d".into(),
+                ctrl: true,
+                shift: false,
+                alt: false,
+                meta: false
+            }
+        );
+    }
+
+    #[test]
+    fn test_parse_key_with_whitespace() {
+        let key = parse_key("  Ctrl+d  ");
+        assert_eq!(
+            key,
+            Key {
+                key: "d".into(),
+                ctrl: true,
+                shift: false,
+                alt: false,
+                meta: false
+            }
+        );
+    }
+
+    #[test]
+    fn test_parse_bindings_single() {
+        let bindings = parse_bindings("Ctrl+n");
+        assert_eq!(bindings.len(), 1);
+        assert_eq!(bindings[0].key, "n");
+        assert!(bindings[0].ctrl);
+    }
+
+    #[test]
+    fn test_parse_bindings_multiple() {
+        let bindings = parse_bindings("Ctrl+n,Ctrl+j");
+        assert_eq!(bindings.len(), 2);
+        assert_eq!(bindings[0].key, "n");
+        assert_eq!(bindings[1].key, "j");
+        assert!(bindings[0].ctrl);
+        assert!(bindings[1].ctrl);
+    }
+
+    #[test]
+    fn test_keybindings_response_single_values() {
+        let config = Config::default();
+        let resp = config.keybindings.to_response();
+        assert_eq!(resp.select.len(), 1);
+        assert_eq!(resp.select[0].key, "enter");
+        assert_eq!(resp.next.len(), 1);
+        assert_eq!(resp.next[0].key, "n");
+        assert!(resp.next[0].ctrl);
+    }
+
+    #[test]
+    fn test_keybindings_response_multiple_values() {
+        let toml = r#"
+[keybindings]
+next = "Ctrl+n,Ctrl+j"
+prev = "Ctrl+p,Ctrl+k"
+"#;
+        let config = Config::from_toml(toml);
+        let resp = config.keybindings.to_response();
+        assert_eq!(resp.next.len(), 2);
+        assert_eq!(resp.next[0].key, "n");
+        assert_eq!(resp.next[1].key, "j");
+        assert_eq!(resp.prev.len(), 2);
+        assert_eq!(resp.prev[0].key, "p");
+        assert_eq!(resp.prev[1].key, "k");
+        assert_eq!(resp.select.len(), 1);
+        assert_eq!(resp.select[0].key, "enter");
+    }
+
+    #[test]
+    fn test_from_toml_custom_keybindings_response() {
+        let toml = r#"
+[keybindings]
+select = "Ctrl+Enter"
+next = "Ctrl+j"
+prev = "Ctrl+k"
+"#;
+        let config = Config::from_toml(toml);
+        let resp = config.keybindings.to_response();
+        assert_eq!(resp.select[0].key, "enter");
+        assert!(resp.select[0].ctrl);
+        assert_eq!(resp.next[0].key, "j");
+        assert_eq!(resp.prev[0].key, "k");
     }
 }
