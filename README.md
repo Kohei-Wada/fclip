@@ -76,8 +76,8 @@ npm run clean     # Remove build artifacts
 |-----|--------|
 | `Enter` | Select item (copy to clipboard) |
 | `Escape` | Close window |
-| `Ctrl+n` | Next item |
-| `Ctrl+p` | Previous item |
+| `Ctrl+n` / `Ctrl+j` | Next item |
+| `Ctrl+p` / `Ctrl+k` | Previous item |
 | `Ctrl+d` | Delete item |
 | `Ctrl+f` | Pin/unpin item (with label) |
 | `Ctrl+h` | Backspace in search |
@@ -97,8 +97,8 @@ max_history = 1000
 select = "Enter"
 close = "Escape"
 delete = "Ctrl+d"
-next = "Ctrl+n"
-prev = "Ctrl+p"
+next = "Ctrl+n,Ctrl+j"      # comma-separated for multiple bindings
+prev = "Ctrl+p,Ctrl+k"
 backspace = "Ctrl+h"
 clear = "Ctrl+u"
 ```

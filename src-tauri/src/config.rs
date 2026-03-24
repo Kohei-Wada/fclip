@@ -58,10 +58,10 @@ fn default_delete() -> String {
     "Ctrl+d".to_string()
 }
 fn default_next() -> String {
-    "Ctrl+n".to_string()
+    "Ctrl+n,Ctrl+j".to_string()
 }
 fn default_prev() -> String {
-    "Ctrl+p".to_string()
+    "Ctrl+p,Ctrl+k".to_string()
 }
 fn default_backspace() -> String {
     "Ctrl+h".to_string()
@@ -196,8 +196,8 @@ mod tests {
         assert_eq!(config.keybindings.select, "Enter");
         assert_eq!(config.keybindings.close, "Escape");
         assert_eq!(config.keybindings.delete, "Ctrl+d");
-        assert_eq!(config.keybindings.next, "Ctrl+n");
-        assert_eq!(config.keybindings.prev, "Ctrl+p");
+        assert_eq!(config.keybindings.next, "Ctrl+n,Ctrl+j");
+        assert_eq!(config.keybindings.prev, "Ctrl+p,Ctrl+k");
         assert_eq!(config.keybindings.backspace, "Ctrl+h");
         assert_eq!(config.keybindings.clear, "Ctrl+u");
     }
@@ -341,14 +341,19 @@ prev = "Ctrl+k"
     }
 
     #[test]
-    fn test_keybindings_response_single_values() {
+    fn test_keybindings_response_default_values() {
         let config = Config::default();
         let resp = config.keybindings.to_response();
         assert_eq!(resp.select.len(), 1);
         assert_eq!(resp.select[0].key, "enter");
-        assert_eq!(resp.next.len(), 1);
+        assert_eq!(resp.next.len(), 2);
         assert_eq!(resp.next[0].key, "n");
+        assert_eq!(resp.next[1].key, "j");
         assert!(resp.next[0].ctrl);
+        assert!(resp.next[1].ctrl);
+        assert_eq!(resp.prev.len(), 2);
+        assert_eq!(resp.prev[0].key, "p");
+        assert_eq!(resp.prev[1].key, "k");
     }
 
     #[test]
