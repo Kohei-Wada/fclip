@@ -120,7 +120,7 @@ fn parse_key(s: &str) -> Key {
 }
 
 fn parse_bindings(s: &str) -> Vec<Key> {
-    s.split(',').map(|b| parse_key(b)).collect()
+    s.split(',').map(parse_key).collect()
 }
 
 impl KeybindingsConfig {
