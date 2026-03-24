@@ -42,8 +42,8 @@ max_history = 1000
 select = "Enter"
 close = "Escape"
 delete = "Ctrl+d"
-next = "Ctrl+n"
-prev = "Ctrl+p"
+next = "Ctrl+n,Ctrl+j"      # comma-separated for multiple bindings
+prev = "Ctrl+p,Ctrl+k"
 backspace = "Ctrl+h"
 clear = "Ctrl+u"
 ```

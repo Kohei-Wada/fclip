@@ -19,12 +19,20 @@ export interface SearchResult {
   display: DisplayInfo;
 }
 
+export interface Key {
+  key: string;
+  ctrl: boolean;
+  shift: boolean;
+  alt: boolean;
+  meta: boolean;
+}
+
 export interface Keybindings {
-  select: string;
-  close: string;
-  delete: string;
-  next: string;
-  prev: string;
-  backspace: string;
-  clear: string;
+  select: Key[];
+  close: Key[];
+  delete: Key[];
+  next: Key[];
+  prev: Key[];
+  backspace: Key[];
+  clear: Key[];
 }
