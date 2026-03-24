@@ -58,6 +58,9 @@ jobs:
       - name: TypeScript check
         run: npx tsc --noEmit
 
+      - name: Test
+        run: npx vitest run
+
   build:
     needs: [check-rust, check-frontend]
     runs-on: windows-latest

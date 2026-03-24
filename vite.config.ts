@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -13,6 +14,7 @@ export default defineConfig(async () => ({
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
   },
+  test: {},
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //

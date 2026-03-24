@@ -9,6 +9,7 @@
     "build:nobundle": "tauri build --no-bundle",
     "check": "cargo check --manifest-path src-tauri/Cargo.toml",
     "test": "cargo test --lib --manifest-path src-tauri/Cargo.toml",
+    "test:front": "vitest run",
     "lint": "cargo clippy --manifest-path src-tauri/Cargo.toml && tsc --noEmit",
     "clean": "cargo clean --manifest-path src-tauri/Cargo.toml",
     "tauri": "tauri",
@@ -43,6 +44,7 @@
     "prettier": "^3.8.1",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.57.1",
-    "vite": "^7.0.4"
+    "vite": "^7.0.4",
+    "vitest": "^4.1.1"
   }
 }

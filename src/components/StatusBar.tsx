@@ -1,15 +1,13 @@
 import type { Key, Keybindings } from "../types";
 
-function formatKey(k: Key): string {
+export function formatKey(k: Key): string {
   const parts = [];
   if (k.ctrl) parts.push("Ctrl");
   if (k.shift) parts.push("Shift");
   if (k.alt) parts.push("Alt");
   if (k.meta) parts.push("Meta");
   parts.push(
-    k.key.length === 1
-      ? k.key.toUpperCase()
-      : k.key.charAt(0).toUpperCase() + k.key.slice(1),
+    k.key.length === 1 ? k.key.toUpperCase() : k.key.charAt(0).toUpperCase() + k.key.slice(1),
   );
   return parts.join("+");
 }
