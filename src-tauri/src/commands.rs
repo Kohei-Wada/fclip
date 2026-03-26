@@ -48,3 +48,8 @@ pub fn toggle_pin(id: i64, label: String, state: State<AppState>) -> Result<bool
 pub fn get_keybindings(state: State<AppState>) -> KeybindingsResponse {
     state.config.keybindings.to_response()
 }
+
+#[tauri::command]
+pub fn get_theme(state: State<AppState>) -> String {
+    state.config.theme.mode.clone()
+}
