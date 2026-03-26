@@ -4,6 +4,10 @@ import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { SearchResult } from "../types";
 
+export function clampIndex(prev: number, length: number): number {
+  return Math.min(prev, Math.max(length - 1, 0));
+}
+
 export function useClipboardSearch() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -23,7 +27,7 @@ export function useClipboardSearch() {
       if (resetIndex) {
         setSelectedIndex(0);
       } else {
-        setSelectedIndex((prev) => Math.min(prev, Math.max(res.length - 1, 0)));
+        setSelectedIndex((prev) => clampIndex(prev, res.length));
       }
     } catch (e) {
       console.error("Search failed:", e);
@@ -88,7 +92,7 @@ export function useClipboardSearch() {
         query: queryRef.current,
       });
       setResults(res);
-      setSelectedIndex((prev) => Math.min(prev, Math.max(res.length - 1, 0)));
+      setSelectedIndex((prev) => clampIndex(prev, res.length));
     } catch (e) {
       console.error("Delete failed:", e);
     }
