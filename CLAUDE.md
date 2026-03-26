@@ -25,6 +25,7 @@ hit Enter, and the selected item is copied to your clipboard. No mouse required.
 - Keyboard-only workflow (hotkey → search → Enter to select)
 - Pin entries with labels (protected from history limit)
 - Configurable hotkey (default: Ctrl+Shift+V)
+- Light/dark theme support (with OS theme detection)
 - Persistent history across restarts
 - Windows-specialized (event-driven monitoring, NSIS/MSI installer)
 - Skips clipboard content larger than 100KB
@@ -38,6 +39,9 @@ open = "Ctrl+Shift+V"
 [behavior]
 max_history = 1000
 
+[theme]
+mode = "system"              # "dark", "light", or "system" (follows OS)
+
 [keybindings]
 select = "Enter"
 close = "Escape"
@@ -46,6 +50,7 @@ next = "Ctrl+n,Ctrl+j"      # comma-separated for multiple bindings
 prev = "Ctrl+p,Ctrl+k"
 backspace = "Ctrl+h"
 clear = "Ctrl+u"
+toggle_theme = "Ctrl+t"
 ```
 
 ## Development

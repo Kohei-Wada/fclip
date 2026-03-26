@@ -8,6 +8,9 @@ open = "Ctrl+Shift+V"
 [behavior]
 max_history = 1000
 
+[theme]
+mode = "system"              # "dark", "light", or "system" (follows OS preference at startup)
+
 [keybindings]
 select = "Enter"
 close = "Escape"
@@ -16,3 +19,4 @@ next = "Ctrl+n,Ctrl+j"      # comma-separated for multiple bindings
 prev = "Ctrl+p,Ctrl+k"
 backspace = "Ctrl+h"
 clear = "Ctrl+u"
+toggle_theme = "Ctrl+t"

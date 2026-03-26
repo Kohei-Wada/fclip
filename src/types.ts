@@ -35,4 +35,5 @@ export interface Keybindings {
   prev: Key[];
   backspace: Key[];
   clear: Key[];
+  toggle_theme: Key[];
 }

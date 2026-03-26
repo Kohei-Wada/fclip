@@ -15,6 +15,7 @@ hit Enter, and the selected item is copied to your clipboard. No mouse required.
 - Keyboard-only workflow (hotkey → search → Enter to select)
 - Pin entries with labels to keep them from being pruned
 - Configurable hotkey and keybindings
+- Light/dark theme support (with OS theme detection)
 - Persistent history across restarts (SQLite)
 - Event-driven clipboard monitoring (no polling)
 - Skips clipboard content larger than 100KB
@@ -81,6 +82,7 @@ npm run clean     # Remove build artifacts
 | `Ctrl+d` | Delete item |
 | `Ctrl+f` | Pin/unpin item (with label) |
 | `Ctrl+h` | Backspace in search |
+| `Ctrl+t` | Toggle light/dark theme |
 
 ## Configuration
 
@@ -93,6 +95,9 @@ open = "Ctrl+Shift+V"
 [behavior]
 max_history = 1000
 
+[theme]
+mode = "system"              # "dark", "light", or "system" (follows OS)
+
 [keybindings]
 select = "Enter"
 close = "Escape"
@@ -101,6 +106,7 @@ next = "Ctrl+n,Ctrl+j"      # comma-separated for multiple bindings
 prev = "Ctrl+p,Ctrl+k"
 backspace = "Ctrl+h"
 clear = "Ctrl+u"
+toggle_theme = "Ctrl+t"
 ```
 
 ## Architecture

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/core";
 import { useClipboardSearch } from "./hooks/useClipboardSearch";
@@ -25,6 +25,29 @@ function App() {
   const keybindings = useKeybindings();
   const [pinMode, setPinMode] = useState<{ id: number } | null>(null);
   const [pinLabel, setPinLabel] = useState("");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  useEffect(() => {
+    invoke<string>("get_theme")
+      .then((mode) => {
+        let resolved: "dark" | "light";
+        if (mode === "system") {
+          resolved = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        } else {
+          resolved = mode === "light" ? "light" : "dark";
+        }
+        setTheme(resolved);
+        document.documentElement.dataset.theme = resolved;
+      })
+      .catch((error) => {
+        console.error("Failed to get theme:", error);
+        const fallback = window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+        setTheme(fallback);
+        document.documentElement.dataset.theme = fallback;
+      });
+  }, []);
 
   const enterPinMode = (id: number) => {
     setPinMode({ id });
@@ -102,6 +125,11 @@ function App() {
         e.preventDefault();
         handleDelete(results[selectedIndex].id);
       }
+    } else if (matchesKeybinding(e, keybindings.toggle_theme)) {
+      e.preventDefault();
+      const next = theme === "dark" ? "light" : "dark";
+      setTheme(next);
+      document.documentElement.dataset.theme = next;
     } else if (e.ctrlKey && e.key === "f") {
       if (results[selectedIndex]) {
         e.preventDefault();

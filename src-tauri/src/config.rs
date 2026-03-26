@@ -10,6 +10,8 @@ pub struct Config {
     pub behavior: BehaviorConfig,
     #[serde(default)]
     pub keybindings: KeybindingsConfig,
+    #[serde(default)]
+    pub theme: ThemeConfig,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -22,6 +24,12 @@ pub struct HotkeyConfig {
 pub struct BehaviorConfig {
     #[serde(default = "default_max_history")]
     pub max_history: usize,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct ThemeConfig {
+    #[serde(default = "default_theme_mode")]
+    pub mode: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -40,6 +48,8 @@ pub struct KeybindingsConfig {
     pub backspace: String,
     #[serde(default = "default_clear")]
     pub clear: String,
+    #[serde(default = "default_toggle_theme")]
+    pub toggle_theme: String,
 }
 
 fn default_hotkey() -> String {
@@ -69,6 +79,12 @@ fn default_backspace() -> String {
 fn default_clear() -> String {
     "Ctrl+u".to_string()
 }
+fn default_toggle_theme() -> String {
+    "Ctrl+t".to_string()
+}
+fn default_theme_mode() -> String {
+    "system".to_string()
+}
 
 impl Default for HotkeyConfig {
     fn default() -> Self {
@@ -82,6 +98,14 @@ impl Default for BehaviorConfig {
     fn default() -> Self {
         Self {
             max_history: default_max_history(),
+        }
+    }
+}
+
+impl Default for ThemeConfig {
+    fn default() -> Self {
+        Self {
+            mode: default_theme_mode(),
         }
     }
 }
@@ -104,6 +128,7 @@ pub struct KeybindingsResponse {
     pub prev: Vec<Key>,
     pub backspace: Vec<Key>,
     pub clear: Vec<Key>,
+    pub toggle_theme: Vec<Key>,
 }
 
 fn parse_key(s: &str) -> Key {
@@ -140,6 +165,7 @@ impl KeybindingsConfig {
             prev: parse_bindings(&self.prev),
             backspace: parse_bindings(&self.backspace),
             clear: parse_bindings(&self.clear),
+            toggle_theme: parse_bindings(&self.toggle_theme),
         }
     }
 }
@@ -154,6 +180,7 @@ impl Default for KeybindingsConfig {
             prev: default_prev(),
             backspace: default_backspace(),
             clear: default_clear(),
+            toggle_theme: default_toggle_theme(),
         }
     }
 }
@@ -207,6 +234,8 @@ mod tests {
         assert_eq!(config.keybindings.prev, "Ctrl+p,Ctrl+k");
         assert_eq!(config.keybindings.backspace, "Ctrl+h");
         assert_eq!(config.keybindings.clear, "Ctrl+u");
+        assert_eq!(config.keybindings.toggle_theme, "Ctrl+t");
+        assert_eq!(config.theme.mode, "system");
     }
 
     #[test]
@@ -402,6 +431,31 @@ prev = "Ctrl+p,Ctrl+k"
         assert_eq!(resp.prev[1].key, "k");
         assert_eq!(resp.select.len(), 1);
         assert_eq!(resp.select[0].key, "enter");
+    }
+
+    #[test]
+    fn test_from_toml_theme_config() {
+        let toml = r#"
+[theme]
+mode = "dark"
+"#;
+        let config = Config::from_toml(toml);
+        assert_eq!(config.theme.mode, "dark");
+    }
+
+    #[test]
+    fn test_from_toml_theme_default_is_system() {
+        let config = Config::from_toml("");
+        assert_eq!(config.theme.mode, "system");
+    }
+
+    #[test]
+    fn test_toggle_theme_keybinding_response() {
+        let config = Config::default();
+        let resp = config.keybindings.to_response();
+        assert_eq!(resp.toggle_theme.len(), 1);
+        assert_eq!(resp.toggle_theme[0].key, "t");
+        assert!(resp.toggle_theme[0].ctrl);
     }
 
     #[test]
