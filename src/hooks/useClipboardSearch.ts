@@ -16,11 +16,15 @@ export function useClipboardSearch() {
     queryRef.current = query;
   }, [query]);
 
-  const search = useCallback(async (q: string) => {
+  const search = useCallback(async (q: string, resetIndex = true) => {
     try {
       const res = await invoke<SearchResult[]>("search_clipboard", { query: q });
       setResults(res);
-      setSelectedIndex(0);
+      if (resetIndex) {
+        setSelectedIndex(0);
+      } else {
+        setSelectedIndex((prev) => Math.min(prev, Math.max(res.length - 1, 0)));
+      }
     } catch (e) {
       console.error("Search failed:", e);
     }
@@ -33,7 +37,7 @@ export function useClipboardSearch() {
     });
 
     const unlisten = listen("clipboard-updated", () => {
-      search(queryRef.current);
+      search(queryRef.current, false);
     });
 
     return () => {
@@ -44,7 +48,7 @@ export function useClipboardSearch() {
   useEffect(() => {
     const unlisten = getCurrentWindow().onFocusChanged(({ payload: focused }) => {
       if (focused) {
-        search(queryRef.current);
+        search(queryRef.current, false);
         inputRef.current?.focus();
       }
     });
