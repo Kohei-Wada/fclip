@@ -103,6 +103,7 @@ pub fn run() {
             commands::toggle_pin,
             commands::get_keybindings,
             commands::get_theme,
+            commands::open_config,
         ])
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {

@@ -83,6 +83,7 @@ npm run clean     # Remove build artifacts
 | `Ctrl+f` | Pin/unpin item (with label) |
 | `Ctrl+h` | Backspace in search |
 | `Ctrl+t` | Toggle light/dark theme |
+| `Ctrl+e` | Open config file |
 | `Ctrl+?` | Toggle help overlay |
 
 ## Configuration
@@ -109,6 +110,7 @@ backspace = "Ctrl+h"
 clear = "Ctrl+u"
 toggle_theme = "Ctrl+t"
 help = "Ctrl+?"
+open_config = "Ctrl+e"
 ```
 
 ## Architecture

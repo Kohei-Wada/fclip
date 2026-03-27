@@ -37,4 +37,5 @@ export interface Keybindings {
   clear: Key[];
   toggle_theme: Key[];
   help: Key[];
+  open_config: Key[];
 }

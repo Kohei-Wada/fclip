@@ -19,6 +19,7 @@ function buildEntries(kb: Keybindings): HelpEntry[] {
     { keys: fmt(kb.clear), action: "clear query" },
     { keys: "Ctrl+F", action: "pin / unpin" },
     { keys: fmt(kb.toggle_theme), action: "toggle theme" },
+    { keys: fmt(kb.open_config), action: "open config" },
     { keys: fmt(kb.help), action: "toggle help" },
   ];
 }
