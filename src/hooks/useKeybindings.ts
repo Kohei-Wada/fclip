@@ -10,7 +10,7 @@ const SHIFTED_SYMBOLS = new Set('~!@#$%^&*()_+{}|:"<>?'.split(""));
 export function matchesKeybinding(e: React.KeyboardEvent, bindings: Key[]): boolean {
   return bindings.some((b) => {
     if (e.ctrlKey !== b.ctrl || e.altKey !== b.alt || e.metaKey !== b.meta) return false;
-    if (e.key.toLowerCase() !== b.key) return false;
+    if (e.key.toLowerCase() !== b.key.toLowerCase()) return false;
     // For shifted symbols (e.g. "?"), don't require explicit Shift in config
     if (SHIFTED_SYMBOLS.has(b.key)) return true;
     return e.shiftKey === b.shift;
