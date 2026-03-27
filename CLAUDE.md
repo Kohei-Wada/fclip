@@ -51,6 +51,7 @@ prev = "Ctrl+p,Ctrl+k"
 backspace = "Ctrl+h"
 clear = "Ctrl+u"
 toggle_theme = "Ctrl+t"
+help = "Ctrl+?"
 ```
 
 ## Development

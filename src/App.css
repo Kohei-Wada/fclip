@@ -116,7 +116,7 @@ body {
 }
 
 .results {
-  flex: 1;
+  height: 100%;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
@@ -179,6 +179,56 @@ body {
   padding: 24px;
   text-align: center;
   color: var(--text-muted);
+}
+
+.results-container {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.help-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.help-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px 24px;
+  min-width: 280px;
+}
+
+.help-title {
+  color: var(--accent);
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.help-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  gap: 24px;
+}
+
+.help-key {
+  color: var(--text);
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.help-action {
+  color: var(--text-muted);
+  text-align: right;
 }
 
 .status-bar {
