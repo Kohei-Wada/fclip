@@ -17,19 +17,22 @@ export function useClipboardSearch() {
     queryRef.current = query;
   }, [query]);
 
-  const search = useCallback(async (q: string, resetIndex = true) => {
-    try {
-      const res = await invoke<SearchResult[]>("search_clipboard", { query: q });
-      setResults(res);
-      if (resetIndex) {
-        cursor.reset();
-      } else {
-        cursor.clamp(res.length);
+  const search = useCallback(
+    async (q: string, resetIndex = true) => {
+      try {
+        const res = await invoke<SearchResult[]>("search_clipboard", { query: q });
+        setResults(res);
+        if (resetIndex) {
+          cursor.reset();
+        } else {
+          cursor.clamp(res.length);
+        }
+      } catch (e) {
+        console.error("Search failed:", e);
       }
-    } catch (e) {
-      console.error("Search failed:", e);
-    }
-  }, []);
+    },
+    [cursor.reset, cursor.clamp],
+  );
 
   useEffect(() => {
     search("").then(() => {
