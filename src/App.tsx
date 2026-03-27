@@ -14,8 +14,7 @@ function App() {
     query,
     setQuery,
     results,
-    selectedIndex,
-    setSelectedIndex,
+    cursor,
     handlePaste,
     handleDelete,
     refreshSearch,
@@ -126,22 +125,22 @@ function App() {
 
     if (matchesKeybinding(e, keybindings.next)) {
       e.preventDefault();
-      setSelectedIndex((i) => (i + 1) % Math.max(results.length, 1));
+      cursor.moveNext(results.length);
     } else if (matchesKeybinding(e, keybindings.prev)) {
       e.preventDefault();
-      setSelectedIndex((i) => (i - 1 + results.length) % Math.max(results.length, 1));
+      cursor.movePrev(results.length);
     } else if (matchesKeybinding(e, keybindings.select)) {
       e.preventDefault();
-      if (results[selectedIndex]) {
-        handlePaste(results[selectedIndex].id);
+      if (results[cursor.selectedIndex]) {
+        handlePaste(results[cursor.selectedIndex].id);
       }
     } else if (matchesKeybinding(e, keybindings.close)) {
       e.preventDefault();
       getCurrentWindow().hide();
     } else if (matchesKeybinding(e, keybindings.delete)) {
-      if (results[selectedIndex] && !results[selectedIndex].pinned) {
+      if (results[cursor.selectedIndex] && !results[cursor.selectedIndex].pinned) {
         e.preventDefault();
-        handleDelete(results[selectedIndex].id);
+        handleDelete(results[cursor.selectedIndex].id);
       }
     } else if (matchesKeybinding(e, keybindings.toggle_theme)) {
       e.preventDefault();
@@ -152,9 +151,9 @@ function App() {
       e.preventDefault();
       invoke("open_config").catch((err) => console.error("Failed to open config:", err));
     } else if (e.ctrlKey && e.key === "f") {
-      if (results[selectedIndex]) {
+      if (results[cursor.selectedIndex]) {
         e.preventDefault();
-        const current = results[selectedIndex];
+        const current = results[cursor.selectedIndex];
         if (current.pinned) {
           await invoke("toggle_pin", { id: current.id, label: "" });
           refreshSearch();
@@ -200,9 +199,9 @@ function App() {
       <div className="results-container">
         <ResultList
           results={results}
-          selectedIndex={selectedIndex}
+          selectedIndex={cursor.selectedIndex}
           onPaste={handlePaste}
-          onSelect={setSelectedIndex}
+          onSelect={cursor.selectByIndex}
           listRef={listRef}
         />
         {showHelp && keybindings && <HelpOverlay keybindings={keybindings} />}
