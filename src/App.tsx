@@ -86,6 +86,8 @@ function App() {
       } else if (matchesKeybinding(e, keybindings.clear)) {
         e.preventDefault();
         setPinLabel("");
+      } else if (e.ctrlKey || e.altKey || e.metaKey) {
+        e.preventDefault();
       }
       return;
     }
@@ -146,6 +148,9 @@ function App() {
       const next = theme === "dark" ? "light" : "dark";
       setTheme(next);
       document.documentElement.dataset.theme = next;
+    } else if (matchesKeybinding(e, keybindings.open_config)) {
+      e.preventDefault();
+      invoke("open_config");
     } else if (e.ctrlKey && e.key === "f") {
       if (results[selectedIndex]) {
         e.preventDefault();
@@ -157,6 +162,8 @@ function App() {
           enterPinMode(current.id);
         }
       }
+    } else if (e.ctrlKey || e.altKey || e.metaKey) {
+      e.preventDefault();
     }
   };
 

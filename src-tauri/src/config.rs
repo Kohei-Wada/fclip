@@ -52,6 +52,8 @@ pub struct KeybindingsConfig {
     pub toggle_theme: String,
     #[serde(default = "default_help")]
     pub help: String,
+    #[serde(default = "default_open_config")]
+    pub open_config: String,
 }
 
 fn default_hotkey() -> String {
@@ -86,6 +88,9 @@ fn default_toggle_theme() -> String {
 }
 fn default_help() -> String {
     "Ctrl+?".to_string()
+}
+fn default_open_config() -> String {
+    "Ctrl+e".to_string()
 }
 fn default_theme_mode() -> String {
     "system".to_string()
@@ -135,6 +140,7 @@ pub struct KeybindingsResponse {
     pub clear: Vec<Key>,
     pub toggle_theme: Vec<Key>,
     pub help: Vec<Key>,
+    pub open_config: Vec<Key>,
 }
 
 fn parse_key(s: &str) -> Key {
@@ -173,6 +179,7 @@ impl KeybindingsConfig {
             clear: parse_bindings(&self.clear),
             toggle_theme: parse_bindings(&self.toggle_theme),
             help: parse_bindings(&self.help),
+            open_config: parse_bindings(&self.open_config),
         }
     }
 }
@@ -189,6 +196,7 @@ impl Default for KeybindingsConfig {
             clear: default_clear(),
             toggle_theme: default_toggle_theme(),
             help: default_help(),
+            open_config: default_open_config(),
         }
     }
 }
@@ -244,6 +252,7 @@ mod tests {
         assert_eq!(config.keybindings.clear, "Ctrl+u");
         assert_eq!(config.keybindings.toggle_theme, "Ctrl+t");
         assert_eq!(config.keybindings.help, "Ctrl+?");
+        assert_eq!(config.keybindings.open_config, "Ctrl+e");
         assert_eq!(config.theme.mode, "system");
     }
 

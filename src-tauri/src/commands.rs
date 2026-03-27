@@ -53,3 +53,19 @@ pub fn get_keybindings(state: State<AppState>) -> KeybindingsResponse {
 pub fn get_theme(state: State<AppState>) -> String {
     state.config.theme.mode.clone()
 }
+
+#[tauri::command]
+pub fn open_config() -> Result<(), FclipError> {
+    let path = Config::config_path();
+    if !path.exists() {
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent)
+                .map_err(|e| FclipError::Config(format!("Failed to create config dir: {}", e)))?;
+        }
+        let default_content = include_str!("../../examples/config.toml");
+        std::fs::write(&path, default_content)
+            .map_err(|e| FclipError::Config(format!("Failed to write config: {}", e)))?;
+    }
+    opener::open(&path).map_err(|e| FclipError::Config(format!("Failed to open config: {}", e)))?;
+    Ok(())
+}

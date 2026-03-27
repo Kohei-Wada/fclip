@@ -52,6 +52,7 @@ backspace = "Ctrl+h"
 clear = "Ctrl+u"
 toggle_theme = "Ctrl+t"
 help = "Ctrl+?"
+open_config = "Ctrl+e"
 ```
 
 ## Development
