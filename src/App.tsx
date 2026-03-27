@@ -150,7 +150,7 @@ function App() {
       document.documentElement.dataset.theme = next;
     } else if (matchesKeybinding(e, keybindings.open_config)) {
       e.preventDefault();
-      invoke("open_config");
+      invoke("open_config").catch((err) => console.error("Failed to open config:", err));
     } else if (e.ctrlKey && e.key === "f") {
       if (results[selectedIndex]) {
         e.preventDefault();
