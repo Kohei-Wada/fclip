@@ -6,6 +6,7 @@ import { useKeybindings, matchesKeybinding } from "./hooks/useKeybindings";
 import { SearchBar } from "./components/SearchBar";
 import { ResultList } from "./components/ResultList";
 import { StatusBar } from "./components/StatusBar";
+import { HelpOverlay } from "./components/HelpOverlay";
 import "./App.css";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
   const [pinMode, setPinMode] = useState<{ id: number } | null>(null);
   const [pinLabel, setPinLabel] = useState("");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     invoke<string>("get_theme")
@@ -84,6 +86,20 @@ function App() {
       } else if (matchesKeybinding(e, keybindings.clear)) {
         e.preventDefault();
         setPinLabel("");
+      }
+      return;
+    }
+
+    if (matchesKeybinding(e, keybindings.help)) {
+      e.preventDefault();
+      setShowHelp((s) => !s);
+      return;
+    }
+
+    if (showHelp) {
+      if (matchesKeybinding(e, keybindings.close) || (e.ctrlKey && e.key === "[")) {
+        e.preventDefault();
+        setShowHelp(false);
       }
       return;
     }
@@ -174,13 +190,16 @@ function App() {
           inputRef={inputRef}
         />
       )}
-      <ResultList
-        results={results}
-        selectedIndex={selectedIndex}
-        onPaste={handlePaste}
-        onSelect={setSelectedIndex}
-        listRef={listRef}
-      />
+      <div className="results-container">
+        <ResultList
+          results={results}
+          selectedIndex={selectedIndex}
+          onPaste={handlePaste}
+          onSelect={setSelectedIndex}
+          listRef={listRef}
+        />
+        {showHelp && keybindings && <HelpOverlay keybindings={keybindings} />}
+      </div>
       <StatusBar keybindings={keybindings} />
     </div>
   );
