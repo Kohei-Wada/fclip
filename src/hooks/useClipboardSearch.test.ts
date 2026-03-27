@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { clampIndex } from "./useClipboardSearch";
+import { clampIndex } from "./useCursor";
 
 describe("clampIndex", () => {
   it("preserves index when within bounds", () => {

@@ -3,18 +3,15 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { SearchResult } from "../types";
-
-export function clampIndex(prev: number, length: number): number {
-  return Math.min(prev, Math.max(length - 1, 0));
-}
+import { useCursor } from "./useCursor";
 
 export function useClipboardSearch() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const queryRef = useRef(query);
+  const cursor = useCursor(listRef);
 
   useEffect(() => {
     queryRef.current = query;
@@ -25,9 +22,9 @@ export function useClipboardSearch() {
       const res = await invoke<SearchResult[]>("search_clipboard", { query: q });
       setResults(res);
       if (resetIndex) {
-        setSelectedIndex(0);
+        cursor.reset();
       } else {
-        setSelectedIndex((prev) => clampIndex(prev, res.length));
+        cursor.clamp(res.length);
       }
     } catch (e) {
       console.error("Search failed:", e);
@@ -67,15 +64,6 @@ export function useClipboardSearch() {
     return () => clearTimeout(timer);
   }, [query, search]);
 
-  useEffect(() => {
-    const list = listRef.current;
-    if (!list) return;
-    const item = list.children[selectedIndex] as HTMLElement;
-    if (item) {
-      item.scrollIntoView({ block: "nearest" });
-    }
-  }, [selectedIndex]);
-
   const handlePaste = async (id: number) => {
     try {
       await invoke("paste_entry", { id });
@@ -92,7 +80,7 @@ export function useClipboardSearch() {
         query: queryRef.current,
       });
       setResults(res);
-      setSelectedIndex((prev) => clampIndex(prev, res.length));
+      cursor.clamp(res.length);
     } catch (e) {
       console.error("Delete failed:", e);
     }
@@ -104,8 +92,7 @@ export function useClipboardSearch() {
     query,
     setQuery,
     results,
-    selectedIndex,
-    setSelectedIndex,
+    cursor,
     handlePaste,
     handleDelete,
     refreshSearch,
