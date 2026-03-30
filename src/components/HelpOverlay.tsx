@@ -21,6 +21,8 @@ function buildEntries(kb: Keybindings): HelpEntry[] {
     { keys: fmt(kb.toggle_theme), action: "toggle theme" },
     { keys: fmt(kb.open_config), action: "open config" },
     { keys: fmt(kb.help), action: "toggle help" },
+    { keys: fmt(kb.tab_next), action: "next tab" },
+    { keys: fmt(kb.tab_prev), action: "prev tab" },
   ];
 }
 

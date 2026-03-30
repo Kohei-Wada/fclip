@@ -231,6 +231,28 @@ body {
   text-align: right;
 }
 
+.tab-bar {
+  display: flex;
+  gap: 0;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 0 12px;
+}
+
+.tab-item {
+  padding: 4px 16px;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: default;
+  border-bottom: 2px solid transparent;
+  user-select: none;
+}
+
+.tab-item.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
 .status-bar {
   padding: 4px 12px;
   background: var(--bg-secondary);

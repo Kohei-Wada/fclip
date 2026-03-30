@@ -46,13 +46,15 @@ mode = "system"              # "dark", "light", or "system" (follows OS)
 select = "Enter"
 close = "Escape"
 delete = "Ctrl+d"
-next = "Ctrl+n,Ctrl+j"      # comma-separated for multiple bindings
-prev = "Ctrl+p,Ctrl+k"
+next = "Ctrl+j"
+prev = "Ctrl+k"
 backspace = "Ctrl+h"
 clear = "Ctrl+u"
 toggle_theme = "Ctrl+t"
 help = "Ctrl+?"
 open_config = "Ctrl+e"
+tab_next = "Ctrl+n"
+tab_prev = "Ctrl+p"
 ```
 
 ## Development

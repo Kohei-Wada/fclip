@@ -15,7 +15,7 @@ export function formatKey(k: Key): string {
 export function StatusBar({ keybindings }: { keybindings: Keybindings | null }) {
   const fmt = (keys: Key[]) => (keys[0] ? formatKey(keys[0]) : "N/A");
   const text = keybindings
-    ? `${fmt(keybindings.select)}: select | ${fmt(keybindings.close)}: close | ${fmt(keybindings.delete)}: delete | ${fmt(keybindings.help)}: help`
+    ? `${fmt(keybindings.select)}: select | ${fmt(keybindings.close)}: close | ${fmt(keybindings.delete)}: delete | ${fmt(keybindings.tab_next)}: tab | ${fmt(keybindings.help)}: help`
     : "";
 
   return (
