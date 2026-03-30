@@ -7,6 +7,7 @@ import { SearchBar } from "./components/SearchBar";
 import { ResultList } from "./components/ResultList";
 import { StatusBar } from "./components/StatusBar";
 import { HelpOverlay } from "./components/HelpOverlay";
+import { TabBar, type Tab } from "./components/TabBar";
 import "./App.css";
 
 function App() {
@@ -27,6 +28,10 @@ function App() {
   const [pinLabel, setPinLabel] = useState("");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [showHelp, setShowHelp] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("all");
+
+  const filteredResults =
+    activeTab === "all" ? results.filter((r) => !r.pinned) : results.filter((r) => r.pinned);
 
   useEffect(() => {
     invoke<string>("get_theme")
@@ -48,6 +53,17 @@ function App() {
         setTheme(fallback);
         document.documentElement.dataset.theme = fallback;
       });
+  }, []);
+
+  useEffect(() => {
+    const unlisten = getCurrentWindow().onFocusChanged(({ payload: focused }) => {
+      if (focused) {
+        setActiveTab("all");
+      }
+    });
+    return () => {
+      unlisten.then((f) => f());
+    };
   }, []);
 
   const enterPinMode = (id: number) => {
@@ -105,6 +121,20 @@ function App() {
       return;
     }
 
+    if (matchesKeybinding(e, keybindings.tab_next)) {
+      e.preventDefault();
+      setActiveTab((t) => (t === "all" ? "pin" : "all"));
+      cursor.reset();
+      return;
+    }
+
+    if (matchesKeybinding(e, keybindings.tab_prev)) {
+      e.preventDefault();
+      setActiveTab((t) => (t === "pin" ? "all" : "pin"));
+      cursor.reset();
+      return;
+    }
+
     if (e.ctrlKey && e.key === "[") {
       e.preventDefault();
       getCurrentWindow().hide();
@@ -125,22 +155,22 @@ function App() {
 
     if (matchesKeybinding(e, keybindings.next)) {
       e.preventDefault();
-      cursor.moveNext(results.length);
+      cursor.moveNext(filteredResults.length);
     } else if (matchesKeybinding(e, keybindings.prev)) {
       e.preventDefault();
-      cursor.movePrev(results.length);
+      cursor.movePrev(filteredResults.length);
     } else if (matchesKeybinding(e, keybindings.select)) {
       e.preventDefault();
-      if (results[cursor.selectedIndex]) {
-        handlePaste(results[cursor.selectedIndex].id);
+      if (filteredResults[cursor.selectedIndex]) {
+        handlePaste(filteredResults[cursor.selectedIndex].id);
       }
     } else if (matchesKeybinding(e, keybindings.close)) {
       e.preventDefault();
       getCurrentWindow().hide();
     } else if (matchesKeybinding(e, keybindings.delete)) {
-      if (results[cursor.selectedIndex] && !results[cursor.selectedIndex].pinned) {
+      if (filteredResults[cursor.selectedIndex] && !filteredResults[cursor.selectedIndex].pinned) {
         e.preventDefault();
-        handleDelete(results[cursor.selectedIndex].id);
+        handleDelete(filteredResults[cursor.selectedIndex].id);
       }
     } else if (matchesKeybinding(e, keybindings.toggle_theme)) {
       e.preventDefault();
@@ -151,9 +181,9 @@ function App() {
       e.preventDefault();
       invoke("open_config").catch((err) => console.error("Failed to open config:", err));
     } else if (e.ctrlKey && e.key === "f") {
-      if (results[cursor.selectedIndex]) {
+      if (filteredResults[cursor.selectedIndex]) {
         e.preventDefault();
-        const current = results[cursor.selectedIndex];
+        const current = filteredResults[cursor.selectedIndex];
         if (current.pinned) {
           await invoke("toggle_pin", { id: current.id, label: "" });
           refreshSearch();
@@ -192,13 +222,14 @@ function App() {
           query={query}
           onQueryChange={setQuery}
           onKeyDown={handleKeyDown}
-          resultCount={results.length}
+          resultCount={filteredResults.length}
           inputRef={inputRef}
         />
       )}
+      <TabBar activeTab={activeTab} />
       <div className="results-container">
         <ResultList
-          results={results}
+          results={filteredResults}
           selectedIndex={cursor.selectedIndex}
           onPaste={handlePaste}
           onSelect={cursor.selectByIndex}

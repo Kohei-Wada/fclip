@@ -38,4 +38,6 @@ export interface Keybindings {
   toggle_theme: Key[];
   help: Key[];
   open_config: Key[];
+  tab_next: Key[];
+  tab_prev: Key[];
 }
