@@ -54,6 +54,10 @@ pub struct KeybindingsConfig {
     pub help: String,
     #[serde(default = "default_open_config")]
     pub open_config: String,
+    #[serde(default = "default_tab_next")]
+    pub tab_next: String,
+    #[serde(default = "default_tab_prev")]
+    pub tab_prev: String,
 }
 
 fn default_hotkey() -> String {
@@ -72,10 +76,10 @@ fn default_delete() -> String {
     "Ctrl+d".to_string()
 }
 fn default_next() -> String {
-    "Ctrl+n,Ctrl+j".to_string()
+    "Ctrl+j".to_string()
 }
 fn default_prev() -> String {
-    "Ctrl+p,Ctrl+k".to_string()
+    "Ctrl+k".to_string()
 }
 fn default_backspace() -> String {
     "Ctrl+h".to_string()
@@ -91,6 +95,12 @@ fn default_help() -> String {
 }
 fn default_open_config() -> String {
     "Ctrl+e".to_string()
+}
+fn default_tab_next() -> String {
+    "Ctrl+n".to_string()
+}
+fn default_tab_prev() -> String {
+    "Ctrl+p".to_string()
 }
 fn default_theme_mode() -> String {
     "system".to_string()
@@ -141,6 +151,8 @@ pub struct KeybindingsResponse {
     pub toggle_theme: Vec<Key>,
     pub help: Vec<Key>,
     pub open_config: Vec<Key>,
+    pub tab_next: Vec<Key>,
+    pub tab_prev: Vec<Key>,
 }
 
 fn parse_key(s: &str) -> Key {
@@ -180,6 +192,8 @@ impl KeybindingsConfig {
             toggle_theme: parse_bindings(&self.toggle_theme),
             help: parse_bindings(&self.help),
             open_config: parse_bindings(&self.open_config),
+            tab_next: parse_bindings(&self.tab_next),
+            tab_prev: parse_bindings(&self.tab_prev),
         }
     }
 }
@@ -197,6 +211,8 @@ impl Default for KeybindingsConfig {
             toggle_theme: default_toggle_theme(),
             help: default_help(),
             open_config: default_open_config(),
+            tab_next: default_tab_next(),
+            tab_prev: default_tab_prev(),
         }
     }
 }
@@ -246,8 +262,8 @@ mod tests {
         assert_eq!(config.keybindings.select, "Enter");
         assert_eq!(config.keybindings.close, "Escape");
         assert_eq!(config.keybindings.delete, "Ctrl+d");
-        assert_eq!(config.keybindings.next, "Ctrl+n,Ctrl+j");
-        assert_eq!(config.keybindings.prev, "Ctrl+p,Ctrl+k");
+        assert_eq!(config.keybindings.next, "Ctrl+j");
+        assert_eq!(config.keybindings.prev, "Ctrl+k");
         assert_eq!(config.keybindings.backspace, "Ctrl+h");
         assert_eq!(config.keybindings.clear, "Ctrl+u");
         assert_eq!(config.keybindings.toggle_theme, "Ctrl+t");
@@ -422,14 +438,11 @@ prev = "Ctrl+k"
         let resp = config.keybindings.to_response();
         assert_eq!(resp.select.len(), 1);
         assert_eq!(resp.select[0].key, "enter");
-        assert_eq!(resp.next.len(), 2);
-        assert_eq!(resp.next[0].key, "n");
-        assert_eq!(resp.next[1].key, "j");
+        assert_eq!(resp.next.len(), 1);
+        assert_eq!(resp.next[0].key, "j");
         assert!(resp.next[0].ctrl);
-        assert!(resp.next[1].ctrl);
-        assert_eq!(resp.prev.len(), 2);
-        assert_eq!(resp.prev[0].key, "p");
-        assert_eq!(resp.prev[1].key, "k");
+        assert_eq!(resp.prev.len(), 1);
+        assert_eq!(resp.prev[0].key, "k");
     }
 
     #[test]
@@ -490,5 +503,26 @@ prev = "Ctrl+k"
         assert!(resp.select[0].ctrl);
         assert_eq!(resp.next[0].key, "j");
         assert_eq!(resp.prev[0].key, "k");
+    }
+
+    #[test]
+    fn test_default_tab_keybindings() {
+        let config = Config::default();
+        assert_eq!(config.keybindings.tab_next, "Ctrl+n");
+        assert_eq!(config.keybindings.tab_prev, "Ctrl+p");
+        assert_eq!(config.keybindings.next, "Ctrl+j");
+        assert_eq!(config.keybindings.prev, "Ctrl+k");
+    }
+
+    #[test]
+    fn test_tab_keybindings_response() {
+        let config = Config::default();
+        let resp = config.keybindings.to_response();
+        assert_eq!(resp.tab_next.len(), 1);
+        assert_eq!(resp.tab_next[0].key, "n");
+        assert!(resp.tab_next[0].ctrl);
+        assert_eq!(resp.tab_prev.len(), 1);
+        assert_eq!(resp.tab_prev[0].key, "p");
+        assert!(resp.tab_prev[0].ctrl);
     }
 }
