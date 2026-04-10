@@ -18,9 +18,10 @@ export function hideWindow() {
   return getCurrentWindow().hide();
 }
 
-export function showWindow() {
+export async function showWindow() {
   const win = getCurrentWindow();
-  return win.show().then(() => win.setFocus());
+  await win.show();
+  await win.setFocus();
 }
 
 // Typed invoke helpers
