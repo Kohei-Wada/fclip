@@ -234,8 +234,8 @@ function App() {
           onSelect={cursor.selectByIndex}
           listRef={listRef}
         />
-        {showHelp && keybindings && <HelpOverlay keybindings={keybindings} />}
       </div>
+      {showHelp && keybindings && <HelpOverlay keybindings={keybindings} />}
       <StatusBar keybindings={keybindings} />
     </div>
   );

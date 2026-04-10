@@ -43,6 +43,7 @@ body {
   flex-direction: column;
   height: 100vh;
   outline: none;
+  position: relative;
 }
 
 .drag-handle {
