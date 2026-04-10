@@ -24,6 +24,8 @@ pub struct HotkeyConfig {
 pub struct BehaviorConfig {
     #[serde(default = "default_max_history")]
     pub max_history: usize,
+    #[serde(default)]
+    pub autostart: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -118,6 +120,7 @@ impl Default for BehaviorConfig {
     fn default() -> Self {
         Self {
             max_history: default_max_history(),
+            autostart: false,
         }
     }
 }

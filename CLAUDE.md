@@ -38,6 +38,7 @@ open = "Ctrl+Shift+V"
 
 [behavior]
 max_history = 1000
+autostart = false              # launch fclip on Windows login
 
 [theme]
 mode = "system"              # "dark", "light", or "system" (follows OS)
