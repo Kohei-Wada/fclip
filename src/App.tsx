@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { invoke } from "@tauri-apps/api/core";
 import { useClipboardSearch } from "./hooks/useClipboardSearch";
 import { useKeybindings, matchesKeybinding } from "./hooks/useKeybindings";
 import { SearchBar } from "./components/SearchBar";
@@ -8,6 +7,7 @@ import { ResultList } from "./components/ResultList";
 import { StatusBar } from "./components/StatusBar";
 import { HelpOverlay } from "./components/HelpOverlay";
 import { TabBar, type Tab } from "./components/TabBar";
+import { getTheme, togglePin, openConfig, hideWindow } from "./commands";
 import "./App.css";
 
 function App() {
@@ -33,8 +33,9 @@ function App() {
   } = useClipboardSearch(pinnedOnly);
 
   useEffect(() => {
-    invoke<string>("get_theme")
-      .then((mode) => {
+    const loadTheme = async () => {
+      try {
+        const mode = await getTheme();
         let resolved: "dark" | "light";
         if (mode === "system") {
           resolved = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
@@ -43,15 +44,16 @@ function App() {
         }
         setTheme(resolved);
         document.documentElement.dataset.theme = resolved;
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Failed to get theme:", error);
         const fallback = window.matchMedia("(prefers-color-scheme: dark)").matches
           ? "dark"
           : "light";
         setTheme(fallback);
         document.documentElement.dataset.theme = fallback;
-      });
+      }
+    };
+    loadTheme();
   }, []);
 
   useEffect(() => {
@@ -72,7 +74,7 @@ function App() {
 
   const confirmPin = async () => {
     if (!pinMode) return;
-    await invoke("toggle_pin", { id: pinMode.id, label: pinLabel });
+    await togglePin(pinMode.id, pinLabel);
     setPinMode(null);
     setPinLabel("");
     refreshSearch();
@@ -136,7 +138,7 @@ function App() {
 
     if (e.ctrlKey && e.key === "[") {
       e.preventDefault();
-      getCurrentWindow().hide();
+      hideWindow();
       return;
     }
 
@@ -165,7 +167,7 @@ function App() {
       }
     } else if (matchesKeybinding(e, keybindings.close)) {
       e.preventDefault();
-      getCurrentWindow().hide();
+      hideWindow();
     } else if (matchesKeybinding(e, keybindings.delete)) {
       if (results[cursor.selectedIndex] && !results[cursor.selectedIndex].pinned) {
         e.preventDefault();
@@ -178,13 +180,13 @@ function App() {
       document.documentElement.dataset.theme = next;
     } else if (matchesKeybinding(e, keybindings.open_config)) {
       e.preventDefault();
-      invoke("open_config").catch((err) => console.error("Failed to open config:", err));
+      openConfig().catch((err) => console.error("Failed to open config:", err));
     } else if (e.ctrlKey && e.key === "f") {
       if (results[cursor.selectedIndex]) {
         e.preventDefault();
         const current = results[cursor.selectedIndex];
         if (current.pinned) {
-          await invoke("toggle_pin", { id: current.id, label: "" });
+          await togglePin(current.id, "");
           refreshSearch();
         } else {
           enterPinMode(current.id);
@@ -199,7 +201,7 @@ function App() {
     <div className="container">
       <div className="drag-handle" data-tauri-drag-region>
         <span className="app-title">fclip v{__APP_VERSION__}</span>
-        <button className="close-btn" onClick={() => getCurrentWindow().hide()}>
+        <button className="close-btn" onClick={() => hideWindow()}>
           ×
         </button>
       </div>

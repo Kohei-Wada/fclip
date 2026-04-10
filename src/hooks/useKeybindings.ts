@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import type { Key, Keybindings } from "../types";
+import { getKeybindings } from "../commands";
 
 // Characters that require Shift to type (symbols on number/punctuation keys).
 // When the configured key is one of these, we skip the strict shiftKey check
@@ -22,7 +22,7 @@ export function useKeybindings() {
 
   useEffect(() => {
     const load = async () => {
-      const kb = await invoke<Keybindings>("get_keybindings");
+      const kb = await getKeybindings();
       setKeybindings(kb);
     };
     load();

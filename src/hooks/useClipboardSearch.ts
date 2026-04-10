@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { SearchResult } from "../types";
 import { useCursor } from "./useCursor";
+import { searchClipboard, pasteEntry, deleteEntry, hideWindow, showWindow } from "../commands";
 
 export function useClipboardSearch(pinnedOnly: boolean | null) {
   const [query, setQuery] = useState("");
@@ -25,10 +25,7 @@ export function useClipboardSearch(pinnedOnly: boolean | null) {
   const search = useCallback(
     async (q: string, resetIndex = true) => {
       try {
-        const res = await invoke<SearchResult[]>("search_clipboard", {
-          query: q,
-          pinnedOnly: pinnedOnlyRef.current,
-        });
+        const res = await searchClipboard(q, pinnedOnlyRef.current);
         setResults(res);
         if (resetIndex) {
           cursor.reset();
@@ -43,10 +40,11 @@ export function useClipboardSearch(pinnedOnly: boolean | null) {
   );
 
   useEffect(() => {
-    search("").then(() => {
-      getCurrentWindow().show();
-      getCurrentWindow().setFocus();
-    });
+    const init = async () => {
+      await search("");
+      await showWindow();
+    };
+    init();
 
     const unlisten = listen("clipboard-updated", () => {
       search(queryRef.current, false);
@@ -77,8 +75,8 @@ export function useClipboardSearch(pinnedOnly: boolean | null) {
 
   const handlePaste = async (id: number) => {
     try {
-      await invoke("paste_entry", { id });
-      await getCurrentWindow().hide();
+      await pasteEntry(id);
+      await hideWindow();
     } catch (e) {
       console.error("Paste failed:", e);
     }
@@ -86,11 +84,8 @@ export function useClipboardSearch(pinnedOnly: boolean | null) {
 
   const handleDelete = async (id: number) => {
     try {
-      await invoke("delete_entry", { id });
-      const res = await invoke<SearchResult[]>("search_clipboard", {
-        query: queryRef.current,
-        pinnedOnly: pinnedOnlyRef.current,
-      });
+      await deleteEntry(id);
+      const res = await searchClipboard(queryRef.current, pinnedOnlyRef.current);
       setResults(res);
       cursor.clamp(res.length);
     } catch (e) {
