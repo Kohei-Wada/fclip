@@ -7,6 +7,10 @@ Designed to replace bloated clipboard tools with a minimal, fzf-style experience
   <img alt="fclip screenshot" src="assets/fclip-dark.png" width="600">
 </p>
 
+<p align="center">
+  <img alt="fclip demo" src="assets/demo.gif" width="600">
+</p>
+
 ## Overview
 
 fclip runs in the system tray and silently monitors your clipboard.
