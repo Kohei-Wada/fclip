@@ -3,6 +3,14 @@
   "private": true,
   "version": "0.5.0",
   "type": "module",
+  "description": "A fast, keyboard-driven clipboard manager for Windows",
+  "author": "Kohei Wada",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kohei-Wada/fclip.git"
+  },
+  "homepage": "https://github.com/Kohei-Wada/fclip",
   "scripts": {
     "dev": "tauri dev",
     "build": "tauri build",
