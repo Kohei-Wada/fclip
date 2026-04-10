@@ -11,6 +11,15 @@ import { TabBar, type Tab } from "./components/TabBar";
 import "./App.css";
 
 function App() {
+  const keybindings = useKeybindings();
+  const [pinMode, setPinMode] = useState<{ id: number } | null>(null);
+  const [pinLabel, setPinLabel] = useState("");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [showHelp, setShowHelp] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("recent");
+
+  const pinnedOnly = activeTab === "pinned" ? true : false;
+
   const {
     query,
     setQuery,
@@ -21,17 +30,7 @@ function App() {
     refreshSearch,
     inputRef,
     listRef,
-  } = useClipboardSearch();
-
-  const keybindings = useKeybindings();
-  const [pinMode, setPinMode] = useState<{ id: number } | null>(null);
-  const [pinLabel, setPinLabel] = useState("");
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-  const [showHelp, setShowHelp] = useState(false);
-  const [activeTab, setActiveTab] = useState<Tab>("all");
-
-  const filteredResults =
-    activeTab === "all" ? results.filter((r) => !r.pinned) : results.filter((r) => r.pinned);
+  } = useClipboardSearch(pinnedOnly);
 
   useEffect(() => {
     invoke<string>("get_theme")
@@ -58,7 +57,7 @@ function App() {
   useEffect(() => {
     const unlisten = getCurrentWindow().onFocusChanged(({ payload: focused }) => {
       if (focused) {
-        setActiveTab("all");
+        setActiveTab("recent");
       }
     });
     return () => {
@@ -123,14 +122,14 @@ function App() {
 
     if (matchesKeybinding(e, keybindings.tab_next)) {
       e.preventDefault();
-      setActiveTab((t) => (t === "all" ? "pin" : "all"));
+      setActiveTab((t) => (t === "recent" ? "pinned" : "recent"));
       cursor.reset();
       return;
     }
 
     if (matchesKeybinding(e, keybindings.tab_prev)) {
       e.preventDefault();
-      setActiveTab((t) => (t === "pin" ? "all" : "pin"));
+      setActiveTab((t) => (t === "pinned" ? "recent" : "pinned"));
       cursor.reset();
       return;
     }
@@ -155,22 +154,22 @@ function App() {
 
     if (matchesKeybinding(e, keybindings.next)) {
       e.preventDefault();
-      cursor.moveNext(filteredResults.length);
+      cursor.moveNext(results.length);
     } else if (matchesKeybinding(e, keybindings.prev)) {
       e.preventDefault();
-      cursor.movePrev(filteredResults.length);
+      cursor.movePrev(results.length);
     } else if (matchesKeybinding(e, keybindings.select)) {
       e.preventDefault();
-      if (filteredResults[cursor.selectedIndex]) {
-        handlePaste(filteredResults[cursor.selectedIndex].id);
+      if (results[cursor.selectedIndex]) {
+        handlePaste(results[cursor.selectedIndex].id);
       }
     } else if (matchesKeybinding(e, keybindings.close)) {
       e.preventDefault();
       getCurrentWindow().hide();
     } else if (matchesKeybinding(e, keybindings.delete)) {
-      if (filteredResults[cursor.selectedIndex] && !filteredResults[cursor.selectedIndex].pinned) {
+      if (results[cursor.selectedIndex] && !results[cursor.selectedIndex].pinned) {
         e.preventDefault();
-        handleDelete(filteredResults[cursor.selectedIndex].id);
+        handleDelete(results[cursor.selectedIndex].id);
       }
     } else if (matchesKeybinding(e, keybindings.toggle_theme)) {
       e.preventDefault();
@@ -181,9 +180,9 @@ function App() {
       e.preventDefault();
       invoke("open_config").catch((err) => console.error("Failed to open config:", err));
     } else if (e.ctrlKey && e.key === "f") {
-      if (filteredResults[cursor.selectedIndex]) {
+      if (results[cursor.selectedIndex]) {
         e.preventDefault();
-        const current = filteredResults[cursor.selectedIndex];
+        const current = results[cursor.selectedIndex];
         if (current.pinned) {
           await invoke("toggle_pin", { id: current.id, label: "" });
           refreshSearch();
@@ -222,21 +221,21 @@ function App() {
           query={query}
           onQueryChange={setQuery}
           onKeyDown={handleKeyDown}
-          resultCount={filteredResults.length}
+          resultCount={results.length}
           inputRef={inputRef}
         />
       )}
       <TabBar activeTab={activeTab} />
       <div className="results-container">
         <ResultList
-          results={filteredResults}
+          results={results}
           selectedIndex={cursor.selectedIndex}
           onPaste={handlePaste}
           onSelect={cursor.selectByIndex}
           listRef={listRef}
         />
-        {showHelp && keybindings && <HelpOverlay keybindings={keybindings} />}
       </div>
+      {showHelp && keybindings && <HelpOverlay keybindings={keybindings} />}
       <StatusBar keybindings={keybindings} />
     </div>
   );
