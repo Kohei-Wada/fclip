@@ -5,22 +5,30 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { SearchResult } from "../types";
 import { useCursor } from "./useCursor";
 
-export function useClipboardSearch() {
+export function useClipboardSearch(pinnedOnly: boolean | null) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const queryRef = useRef(query);
+  const pinnedOnlyRef = useRef(pinnedOnly);
   const cursor = useCursor(listRef);
 
   useEffect(() => {
     queryRef.current = query;
   }, [query]);
 
+  useEffect(() => {
+    pinnedOnlyRef.current = pinnedOnly;
+  }, [pinnedOnly]);
+
   const search = useCallback(
     async (q: string, resetIndex = true) => {
       try {
-        const res = await invoke<SearchResult[]>("search_clipboard", { query: q });
+        const res = await invoke<SearchResult[]>("search_clipboard", {
+          query: q,
+          pinnedOnly: pinnedOnlyRef.current,
+        });
         setResults(res);
         if (resetIndex) {
           cursor.reset();
@@ -65,7 +73,7 @@ export function useClipboardSearch() {
   useEffect(() => {
     const timer = setTimeout(() => search(query), 100);
     return () => clearTimeout(timer);
-  }, [query, search]);
+  }, [query, pinnedOnly, search]);
 
   const handlePaste = async (id: number) => {
     try {
@@ -81,6 +89,7 @@ export function useClipboardSearch() {
       await invoke("delete_entry", { id });
       const res = await invoke<SearchResult[]>("search_clipboard", {
         query: queryRef.current,
+        pinnedOnly: pinnedOnlyRef.current,
       });
       setResults(res);
       cursor.clamp(res.length);

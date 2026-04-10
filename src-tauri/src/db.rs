@@ -100,15 +100,37 @@ impl Database {
         Ok(result)
     }
 
-    pub fn list_entries(&self, limit: usize) -> Result<Vec<ClipboardEntry>> {
+    pub fn list_entries(
+        &self,
+        limit: usize,
+        pinned_only: Option<bool>,
+    ) -> Result<Vec<ClipboardEntry>> {
         let conn = self.conn.lock()?;
-        let mut stmt = conn.prepare_cached(
-            "SELECT id, content, created_at, last_used_at, pinned, label
-             FROM clipboard_entries ORDER BY pinned DESC, last_used_at DESC LIMIT ?1",
-        )?;
+
+        let (sql, params_vec): (&str, Vec<Box<dyn rusqlite::types::ToSql>>) = match pinned_only {
+            Some(true) => (
+                "SELECT id, content, created_at, last_used_at, pinned, label
+                 FROM clipboard_entries WHERE pinned = 1 ORDER BY last_used_at DESC LIMIT ?1",
+                vec![Box::new(limit)],
+            ),
+            Some(false) => (
+                "SELECT id, content, created_at, last_used_at, pinned, label
+                 FROM clipboard_entries WHERE pinned = 0 ORDER BY last_used_at DESC LIMIT ?1",
+                vec![Box::new(limit)],
+            ),
+            None => (
+                "SELECT id, content, created_at, last_used_at, pinned, label
+                 FROM clipboard_entries ORDER BY pinned DESC, last_used_at DESC LIMIT ?1",
+                vec![Box::new(limit)],
+            ),
+        };
+
+        let mut stmt = conn.prepare_cached(sql)?;
+        let params_refs: Vec<&dyn rusqlite::types::ToSql> =
+            params_vec.iter().map(|p| p.as_ref()).collect();
 
         let entries = stmt
-            .query_map(params![limit], |row| {
+            .query_map(params_refs.as_slice(), |row| {
                 Ok(ClipboardEntry {
                     id: row.get(0)?,
                     content: row.get(1)?,
@@ -182,7 +204,7 @@ mod tests {
         assert_eq!(db.save_entry("world").unwrap(), InsertResult::New);
         assert_eq!(db.save_entry("hello").unwrap(), InsertResult::Duplicate);
 
-        let entries = db.list_entries(1000).unwrap();
+        let entries = db.list_entries(1000, None).unwrap();
         assert_eq!(entries.len(), 2);
     }
 
@@ -191,11 +213,11 @@ mod tests {
         let db = Database::open_in_memory().unwrap();
         db.save_entry("test").unwrap();
 
-        let entries = db.list_entries(1000).unwrap();
+        let entries = db.list_entries(1000, None).unwrap();
         let id = entries[0].id;
 
         db.delete_entry(id).unwrap();
-        assert_eq!(db.list_entries(1000).unwrap().len(), 0);
+        assert_eq!(db.list_entries(1000, None).unwrap().len(), 0);
     }
 
     #[test]
@@ -203,13 +225,13 @@ mod tests {
         let db = Database::open_in_memory().unwrap();
         db.save_entry("pinned item").unwrap();
 
-        let entries = db.list_entries(1000).unwrap();
+        let entries = db.list_entries(1000, None).unwrap();
         let id = entries[0].id;
 
         db.toggle_pin(id, "keep".to_string()).unwrap();
         db.delete_entry(id).unwrap();
         assert_eq!(
-            db.list_entries(1000).unwrap().len(),
+            db.list_entries(1000, None).unwrap().len(),
             1,
             "pinned entry should not be deleted"
         );
@@ -223,7 +245,7 @@ mod tests {
         }
 
         db.enforce_history_limit(3).unwrap();
-        assert_eq!(db.list_entries(1000).unwrap().len(), 3);
+        assert_eq!(db.list_entries(1000, None).unwrap().len(), 3);
     }
 
     #[test]
@@ -231,7 +253,7 @@ mod tests {
         let db = Database::open_in_memory().unwrap();
         db.save_entry("content here").unwrap();
 
-        let entries = db.list_entries(1000).unwrap();
+        let entries = db.list_entries(1000, None).unwrap();
         let id = entries[0].id;
 
         let content = db.use_entry(id).unwrap();
@@ -244,7 +266,7 @@ mod tests {
         let emoji_text = "Hello \u{1F600}\u{1F680} world \u{1F468}\u{200D}\u{1F4BB}";
         db.save_entry(emoji_text).unwrap();
 
-        let entries = db.list_entries(1000).unwrap();
+        let entries = db.list_entries(1000, None).unwrap();
         assert_eq!(entries.len(), 1);
         assert_eq!(entries[0].content, emoji_text);
     }

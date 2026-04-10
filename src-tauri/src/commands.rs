@@ -14,6 +14,7 @@ pub struct AppState {
 #[tauri::command]
 pub fn search_clipboard(
     query: String,
+    pinned_only: Option<bool>,
     state: State<AppState>,
 ) -> Result<Vec<SearchResult>, FclipError> {
     use crate::constants::MAX_SEARCH_RESULTS;
@@ -22,7 +23,7 @@ pub fn search_clipboard(
     } else {
         state.config.behavior.max_history
     };
-    let entries = state.db.list_entries(limit)?;
+    let entries = state.db.list_entries(limit, pinned_only)?;
     Ok(state.searcher.search(&entries, &query, MAX_SEARCH_RESULTS))
 }
 
