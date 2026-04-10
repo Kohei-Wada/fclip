@@ -16,9 +16,9 @@ function App() {
   const [pinLabel, setPinLabel] = useState("");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [showHelp, setShowHelp] = useState(false);
-  const [activeTab, setActiveTab] = useState<Tab>("all");
+  const [activeTab, setActiveTab] = useState<Tab>("recent");
 
-  const pinnedOnly = activeTab === "pin" ? true : false;
+  const pinnedOnly = activeTab === "pinned" ? true : false;
 
   const {
     query,
@@ -57,7 +57,7 @@ function App() {
   useEffect(() => {
     const unlisten = getCurrentWindow().onFocusChanged(({ payload: focused }) => {
       if (focused) {
-        setActiveTab("all");
+        setActiveTab("recent");
       }
     });
     return () => {
@@ -122,14 +122,14 @@ function App() {
 
     if (matchesKeybinding(e, keybindings.tab_next)) {
       e.preventDefault();
-      setActiveTab((t) => (t === "all" ? "pin" : "all"));
+      setActiveTab((t) => (t === "recent" ? "pinned" : "recent"));
       cursor.reset();
       return;
     }
 
     if (matchesKeybinding(e, keybindings.tab_prev)) {
       e.preventDefault();
-      setActiveTab((t) => (t === "pin" ? "all" : "pin"));
+      setActiveTab((t) => (t === "pinned" ? "recent" : "pinned"));
       cursor.reset();
       return;
     }
