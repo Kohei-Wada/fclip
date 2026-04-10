@@ -31,11 +31,20 @@
   "bundle": {
     "active": true,
     "targets": ["nsis", "msi"],
+    "copyright": "Copyright (c) 2025 Kohei Wada",
+    "shortDescription": "A fast, keyboard-driven clipboard manager for Windows",
+    "longDescription": "fclip is a minimal, fzf-style clipboard manager that runs in the system tray and provides instant fuzzy-search access to your clipboard history.",
+    "licenseFile": "../LICENSE",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    }
   }
 }

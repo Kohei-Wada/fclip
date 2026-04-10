@@ -86,6 +86,7 @@ pub fn run() {
     let db = Arc::new(Database::new(&db_path).expect("Failed to initialize database"));
 
     let max_history = config.behavior.max_history;
+    let autostart = config.behavior.autostart;
     let hotkey = config.hotkey.open.clone();
 
     let state = AppState {
@@ -95,6 +96,10 @@ pub fn run() {
     };
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            None,
+        ))
         .manage(state)
         .invoke_handler(tauri::generate_handler![
             commands::search_clipboard,
@@ -114,6 +119,15 @@ pub fn run() {
         .setup(move |app| {
             setup_tray(app)?;
             setup_global_shortcut(app, &hotkey)?;
+
+            use tauri_plugin_autostart::ManagerExt;
+            let autostart_manager = app.autolaunch();
+            if autostart {
+                let _ = autostart_manager.enable();
+                eprintln!("[fclip] Autostart enabled");
+            } else {
+                let _ = autostart_manager.disable();
+            }
 
             let app_handle = app.handle().clone();
 
