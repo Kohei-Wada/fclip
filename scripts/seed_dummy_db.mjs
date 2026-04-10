@@ -14,7 +14,11 @@ import { DatabaseSync } from "node:sqlite";
 
 const DB_DIR = join(homedir(), "AppData", "Local", "fclip");
 const DB_PATH = join(DB_DIR, "history.db");
+const WAL_PATH = join(DB_DIR, "history.db-wal");
+const SHM_PATH = join(DB_DIR, "history.db-shm");
 const BAK_PATH = join(DB_DIR, "history.db.bak");
+const WAL_BAK_PATH = join(DB_DIR, "history.db-wal.bak");
+const SHM_BAK_PATH = join(DB_DIR, "history.db-shm.bak");
 
 const sha256 = (text) => createHash("sha256").update(text).digest("hex");
 
@@ -57,7 +61,9 @@ function createDummyDb() {
       process.exit(1);
     }
     renameSync(DB_PATH, BAK_PATH);
-    console.log(`Backed up: ${DB_PATH} -> ${BAK_PATH}`);
+    if (existsSync(WAL_PATH)) renameSync(WAL_PATH, WAL_BAK_PATH);
+    if (existsSync(SHM_PATH)) renameSync(SHM_PATH, SHM_BAK_PATH);
+    console.log(`Backed up: ${DB_PATH} (+ WAL/SHM) -> ${BAK_PATH}`);
   }
 
   const db = new DatabaseSync(DB_PATH);
@@ -96,8 +102,12 @@ function restore() {
     process.exit(1);
   }
   if (existsSync(DB_PATH)) unlinkSync(DB_PATH);
+  if (existsSync(WAL_PATH)) unlinkSync(WAL_PATH);
+  if (existsSync(SHM_PATH)) unlinkSync(SHM_PATH);
   renameSync(BAK_PATH, DB_PATH);
-  console.log(`Restored: ${BAK_PATH} -> ${DB_PATH}`);
+  if (existsSync(WAL_BAK_PATH)) renameSync(WAL_BAK_PATH, WAL_PATH);
+  if (existsSync(SHM_BAK_PATH)) renameSync(SHM_BAK_PATH, SHM_PATH);
+  console.log(`Restored: ${BAK_PATH} (+ WAL/SHM) -> ${DB_PATH}`);
 }
 
 if (process.argv.includes("--restore")) {
