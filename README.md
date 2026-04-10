@@ -3,6 +3,10 @@
 A fast, keyboard-driven clipboard manager for Windows built with Tauri (Rust + React).
 Designed to replace bloated clipboard tools with a minimal, fzf-style experience.
 
+<p align="center">
+  <img alt="fclip screenshot" src="assets/fclip-dark.png" width="600">
+</p>
+
 ## Overview
 
 fclip runs in the system tray and silently monitors your clipboard.
